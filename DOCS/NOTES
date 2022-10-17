@@ -1,0 +1,9 @@
+I can get screens and fonts in now, using the code in decomprs.
+
+For screens, use L2G and then N2D (this gives uncompressed screen)
+
+Characters are stored at the top of the LBM screen so I can get their 
+values for collision groups (safe, floatable, harmful, etc.)
+
+
+

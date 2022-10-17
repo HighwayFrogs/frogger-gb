@@ -1,0 +1,213 @@
+;****************************************
+;*    								*
+;*	      AUDIODRU.AUD	   			*
+;*    								*
+;*							 	*
+;*    Sound 4 Drum Audio Driver Data	*
+;*								*
+;* Copyright (c) 1991 Imagineering, Inc.*
+;*								*
+;****************************************
+;
+;
+;    Prepared for Imagineering, Inc. by
+;
+;    	Stuart E. Ross
+;    	New Potato Technologies
+;    	P.O. Box 187
+;    	Danbury, CT  06813
+;
+;    	TEL:  (203) 746-9040
+;    	FAX:  (203) 746-6929
+;
+
+;--------------------------------
+;      Drum Kit Equates
+;--------------------------------
+
+cindex  .SET     $01
+;
+bassd1	equ	cindex
+cindex  .SET    cindex+1
+;
+bassd2	equ	cindex
+cindex .SET     cindex+1
+;
+bassd3	equ	cindex
+cindex .SET     cindex+1
+;
+clshi1	equ	cindex
+cindex .SET     cindex+1
+;
+clshi2	equ	cindex
+cindex .SET     cindex+1
+;
+cowbl1	equ	cindex
+cindex .SET     cindex+1
+;
+cymbl1	equ	cindex
+cindex .SET     cindex+1
+;
+cymbl2	equ	cindex
+cindex .SET     cindex+1
+;
+cymbl3	equ	cindex
+cindex .SET     cindex+1
+;
+cymbl4	equ	cindex
+cindex .SET     cindex+1
+;
+cymbl5	equ	cindex
+cindex .SET     cindex+1
+;
+cymbl6	equ	cindex
+cindex .SET     cindex+1
+;
+cymbl7	equ	cindex
+cindex .SET     cindex+1
+;
+lcong1	equ	cindex
+cindex .SET     cindex+1
+;
+lcong2	equ	cindex
+cindex .SET     cindex+1
+;
+lcong3	equ	cindex
+cindex .SET     cindex+1
+;
+lcong4	equ	cindex
+cindex .SET     cindex+1
+;
+snare1	equ	cindex
+cindex  .SET    cindex+1
+;
+hitom1	equ	cindex
+cindex  .SET    cindex+1
+;
+hicng1	equ	cindex
+cindex  .SET    cindex+1
+;
+lotom1	equ	cindex
+cindex  .SET    cindex+1
+;
+mitom1	equ	cindex
+cindex  .SET    cindex+1
+;
+timba1	equ	cindex
+cindex  .SET    cindex+1
+;
+handcl	equ	cindex
+
+;--------------------------------
+;      Drum Kit SND4 Data
+;--------------------------------
+
+drum0
+
+drumtab equ     $-4
+
+;       	ctl frq
+;       	--- ---
+
+	ifdef   bassd1
+	db      $00,$41,$00,$80       ;bassd1
+	endif
+;
+	ifdef   bassd2
+	db      $00,$41,$00,$80       ;bassd2
+	endif
+;
+	ifdef   bassd3
+	db      $00,$41,$00,$80       ;bassd3
+	endif
+;
+	ifdef   clshi1
+	db      0,$41,$15,$80         ;clshi1
+	endif
+;
+	ifdef   clshi2
+	db      0,$41,$15,$80         ;clshi2
+	endif
+;
+	ifdef   cowbl1
+	db      0,$41,$19,$80         ;cowbl1
+	endif
+;
+	ifdef   cymbl1
+	db      0,$43,$04,$80         ;cymbl1
+	endif
+;
+	ifdef   cymbl2
+	db      0,$43,$04,$80         ;cymbl2
+	endif
+;
+	ifdef   cymbl3
+	db      0,$43,$04,$80         ;cymbl3
+	endif
+;
+	ifdef   cymbl4
+	db      0,$43,$04,$80         ;cymbl4
+	endif
+;
+	ifdef   cymbl5
+	db      0,$43,$04,$80         ;cymbl5
+	endif
+;
+	ifdef   cymbl6
+	db      0,$43,$04,$80         ;cymbl6
+	endif
+;
+	ifdef   cymbl7
+	db      0,$43,$04,$80         ;cymbl7
+	endif
+;
+	ifdef   lcong1
+	db      0,$51,$00,$80         ;lcong1
+	endif
+;
+	ifdef   lcong2
+	db      0,$51,$00,$80         ;lcong2
+	endif
+;
+	ifdef   lcong3
+	db      0,$51,$00,$80         ;lcong3
+	endif
+;
+	ifdef   lcong4
+	db      0,$51,$00,$80         ;lcong4
+	endif
+;
+	ifdef   snare1
+	db      0,$51,$00,$80         ;snare1
+	endif
+;
+	ifdef   hitom1
+	db      0,$51,$00,$80         ;hitom1
+	endif
+;
+	ifdef   hicng1
+	db      0,$51,$00,$80         ;snare1
+	endif
+;
+	ifdef   lotom1
+	db      0,$51,$00,$80         ;lotom1
+	endif
+;
+	ifdef   mitom1
+	db      0,$51,$00,$80         ;mitom1
+	endif
+;
+	ifdef   timba1
+	db      0,$51,$00,$80         ;timba1
+	endif
+;
+	ifdef   handcl
+	db      0,$51,$00,$80         ;handcl
+	endif
+;
+;
+drumsx
+drumsize	equ	drumsx-drum0
+;
+;
+

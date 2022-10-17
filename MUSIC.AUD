@@ -1,0 +1,733 @@
+;****************************************
+;*								*
+;*             MUSIC.AUD				*
+;*								*
+;*	GameBoy Music Sub-System		*
+;*								*
+;*	    							*
+;* Copyright (c) 1991 Imagineering, Inc.*
+;*	    							*
+;****************************************
+;
+;
+;    Prepared for Imagineering, Inc. by
+;    
+;	Stuart E. Ross
+;	New Potato Technologies
+;	P.O. Box 187
+;	Danbury, CT  06813
+;
+;	TEL:  (203) 746-9040
+;	FAX:  (203) 746-6929
+;
+;
+;--------------------------------------
+
+;--------------------------------------
+;       
+;	Music Main Handler - 60Hz
+;       
+;--------------------------------------
+
+musicstart					; size start
+
+music
+
+;	music currently active?
+
+	ld	hl,npt_clk		; general purpose timer
+	inc	(hl)
+
+	ld	a,(hl)			; pass over delay?
+	and	%0000000
+	ret	nz
+
+ 	ld      a,(sngnum)      ; song playing?
+	or      a
+	ret     z
+
+;       increment the metronome
+
+	xor	a				; clear b,d
+	ld	b,a
+	ld	d,a
+
+	ld      a,(tempo)       ;increment pulse clock a fractional amount
+	ld      hl,tfract
+	add     a,(hl)
+	ld      (hl),a
+
+	ld      hl,tflag        ;tflag holds carry of fractional addition
+	rr      (hl)
+	bit     7,(hl)
+l0      jr      z,l1
+
+	ld      hl,mentron+1    ;do 96 pulse/measure mentronome
+	inc     (hl)
+	ld      a,(hl)          ;compare integer part of mentron with 96
+	cp      96+1            ;if under 96 pulses,
+	jr      c,l1            ;then done
+
+	ld      a,1             ;else reset mentron+1 to 1
+	ld      (hld),a
+	inc     (hl)            ;and inc hi byte
+l1
+
+;	Init driver service loop
+
+	ld      c,3             ;handle each driver, 3 .. 0
+;       
+;
+;	Main  driver service loop
+;
+
+musloop
+
+;	handle muted channels
+
+	ld	hl,mute			; build pointer into mute table
+	ld	a,(sngnum)
+	sla	a
+	sla	a
+	add	a,c				; check driver status
+	ld	e,a
+	add	hl,de
+	bit	7,(hl)			; mute if neg
+	jr	nz,nextdrv
+
+; 	next tick to process?  (this should be at outside of loop)
+
+	ld      hl,tflag        ;if tflag, metronome has ticked
+	bit     7,(hl)
+	jr      z,nextdrv       ;then skip sequencing
+
+;	process next tick for this driver
+
+	ld      hl,mtime        ;dec time for this driver
+	add     hl,bc
+	dec     (hl)
+	jr      nz,ml0
+
+;	process next event
+
+	call    next_event
+	ret     c               ;else if carry, song over
+
+;	process current event
+
+ml0	call	current_event
+
+;	next driver please!
+
+nextdrv	dec     c               ;next driver
+	bit     7,c             ;loop until negative driver number
+	jp      z,musloop
+
+musend
+	ld      hl,stflag       ;clear stflag
+	srl     (hl)
+none
+	ret
+
+;----------------------------------------------
+;       
+;    NEXT_EVENT
+;
+;    Initialize new event for current driver
+;
+;	bc - sound channel to hit
+;
+;	returns C - set: event started
+;		C - clr: Song ended
+;
+;----------------------------------------------
+
+next_event
+
+	ld      a,(stflag)      ;copy start flag to inc event flag
+	ld      (ieflag),a      ;(if TRUE, inc event is supressed)
+
+	ld      hl,seqnum       ;temp store sequence index
+	add     hl,bc
+	ld      a,(hl)
+	ld      (seqi),a
+
+	ld      hl,mesnum       ;and measure index
+	add     hl,bc
+	ld      a,(hl)
+	ld      (mesi),a
+
+	ld      hl,evtnum       ;and measure index
+	add     hl,bc
+	ld      a,(hl)
+	ld      (evti),a
+
+	ld      hl,sngpt0       ;lookup song pointer for this driver
+	ld      e,c
+	sla     e               ;index words
+	add     hl,de
+
+	ld      a,(hli)
+	ld      (sngpnt),a
+	ld      a,(hl)
+	ld      (sngpnt+1),a    ;put in sngpnt FF temp
+
+	ld      a,(seqi)        ;put sequence index into E
+	ld      e,a
+
+nsire                           ;new sequence index ready in E
+	sla     e               ;index words
+	ld      a,(sngpnt)      ;read measure list addr
+	ld      l,a
+	ld      a,(sngpnt+1)
+	ld      h,a
+	add     hl,de
+	ld      a,(hli)
+	ld      (mslpnt),a
+	ld      a,(hl)
+	or      a               ;if high byte of measure list pointer
+	jr      nz,normmlp      ;if not 0, then normal
+
+	ld      a,(mslpnt)      ;else abnormal. regain low byte
+	bit     7,a             ;if minus,
+	jp      nz,songover     ;song over
+
+	ld      e,a             ;else revise sequence index
+	ld      (seqi),a
+	jr      nsire           ;and go to "new sequence index ready in E"
+
+;	normal measure list pointer
+
+normmlp                         ;here if normal measure list pointer
+	ld      (mslpnt+1),a    ;and put in FF mslpnt
+
+	ld      a,(mesi)        ;put measure index into E
+	ld      e,a
+
+;	measure index ready - process new measure
+
+mire                            ;measure index ready in E
+
+	sla     e               ;index words
+	rl      d               ;>256 (re-zero d later)
+
+	ld      a,(mslpnt)
+	ld      l,a
+	ld      a,(mslpnt+1)
+	ld      h,a
+	add     hl,de
+
+	ld      d,0             ;repair D reg to 0
+
+	ld      a,(hli)
+	ld      (mespnt),a      ;store low measure pointer
+	ld      a,(hl)
+	or      a               ;if not 0, then normal
+	jr      nz,normmes
+
+	xor     a               ;abnormal measure pointer. Zero
+	ld      (mesi),a        ;measure index
+	ld      hl,seqi         ;inc sequence index
+	inc     (hl)
+	ld      e,(hl)          ;put new sequence index in E
+	jr      nsire           ;jump new sequence index ready in E
+
+;	normal mesure
+
+normmes                         ;here if normal measure
+	ld      (mespnt+1),a    ;save high mespnt
+
+	ld      a,(evti)        ;point to event index
+
+l0      ld      hl,ieflag       ;if inc event flag TRUE,
+	bit     7,(hl)
+	jr      nz,l1           ;then don't inc event index.
+
+	add     a,3             ;else do (this passes the last valid note)
+	ld      (evti),a
+	ld      (hl),$FF        ;and set ieflag to prevent any more incs
+l1
+	ld      e,a             ;put event index into E
+
+;	event index ready - process new event
+
+eire                            ;event index ready in E
+	ld      a,(mespnt)
+	ld      l,a
+	ld      a,(mespnt+1)
+	ld      h,a
+	add     hl,de
+
+	ld      a,(hli)         ;read event time
+	or      a
+	jr      z,endevt        ;if zero end of event list
+
+	cp      prgcng          ; program change?
+	jr      nz,NoteRdy
+
+;	program change event
+
+progchng
+
+	ld      e,(hl)         	; fetch instrument spec index
+
+	ld	hl,instyp		; fetch instrument ID
+	add	hl,de
+	ld	a,(hl)
+	push	hl
+
+	and	$0f				; sixteen instruments
+
+	ld      hl,insnum		; save instrument ID
+	add     hl,bc
+	ld      (hl),a
+
+	pop	hl				; fetch channel volume
+	ld	a,(hl)			
+	and	$f0
+
+	ld	hl,vol			; save channel volume
+	add	hl,bc
+	ld	(hl),a
+
+	ld      a,(evti)        ; pass this event
+	add     a,3
+	ld      (evti),a
+	ld      e,a
+	jr      eire            ; jump to "event index ready in E"
+
+;	end of event list
+
+endevt                          ;here if the last event in a measure
+	xor     a               ;zero event index
+	ld      (evti),a
+	ld      a,(mesi)        ;inc measure index
+	inc     a
+	ld      (mesi),a
+	ld      e,a
+	jr      mire            ;jump to "measure index ready in E"
+
+;	song is over
+
+songover
+	xor     a               ;end the song
+	call    setseq
+	scf
+	ret
+
+;-----------------------------------------------------------------
+;
+;       Start a new event process for this driver and instrument
+;
+;       a  - ticks to next event
+;	bc - current driver
+;	hl - pointing to pitch value in event
+;
+;	Event format:
+;
+;	Time		- ticks until start of next event
+;	Note Value	- note/pitch to play
+;	Duration	- tick count for duration
+;
+;-----------------------------------------------------------------
+
+NoteRdy                         ; event is ready to start
+
+;	fetch event information
+
+	push    hl			
+
+	ld      hl,mtime        ; store time to next event
+	add     hl,bc
+	ld      (hl),a
+
+	pop     hl		 		; get pitch, auto inc
+	ld      a,(hli)         
+	push    hl
+
+	and     %00111111       ; low bits are note value
+
+	ld      hl,pitch        ; store note value
+	add     hl,bc
+	ld      (hl),a
+
+	pop     hl				; get duration
+	ld      a,(hl)          
+
+	ld      hl,dur          ; store duration
+	add     hl,bc
+	ld      (hl),a
+
+	ld      hl,envcnt       ; store duration into evncnt
+	add     hl,bc
+	ld      (hl),a
+
+;	initiate event through instrument driver
+
+	ld	hl,doneNR		; fix return/continue address
+	push	hl
+
+	ld      hl,insnum       ; fetch instrument # for this ch
+	add     hl,bc
+	ld      a,(hl)
+	and	$0f				; sixteen instruments
+	sla	a
+	ld	e,a
+
+	ld	hl,inst_init	; base of instrument table
+	add     hl,de
+
+	ld      e,(hl)			; fetch routine vector
+	inc	hl
+	ld	d,(hl)
+
+	push	de				; FUNKY indirect jump to start event
+	ld      d,0             ; repair D reg to 0
+	ret
+
+;	Finished with new event
+
+doneNR                          ;finish up
+
+	ld      hl,seqnum       ;store revised sequence index
+	add     hl,bc
+	ld      a,(seqi)
+	ld      (hl),a
+
+	ld      hl,mesnum       ;and measure index
+	add     hl,bc
+	ld      a,(mesi)
+	ld      (hl),a
+
+	ld      hl,evtnum       ;and event index
+	add     hl,bc
+	ld      a,(evti)
+	ld      (hl),a
+
+	or      a               ;song in play - clear carry flag
+	ret
+
+;----------------------------------------------
+;       
+;    CURRENT_EVENT
+;
+;    Support current event for current driver
+;
+;	bc - sound channel to hit
+;
+;----------------------------------------------
+
+current_event
+
+	ld      hl,insnum       ; fetch instrument # for this ch
+	add     hl,bc
+	ld      a,(hl)
+	and	$0f				; sixteen insts
+	sla	a
+	ld	e,a
+
+	ld	hl,inst_play	; base of routine table
+	add     hl,de
+
+	ld      e,(hl)			; fetch routine vector
+	inc	hl
+	ld      d,(hl)
+
+	push	de				; FUNKY indirect jump to start event
+	ld      d,0             ; repair D reg to 0
+	ret
+
+;-------------------------------
+;
+;    Include Instrument Kit
+;
+;-------------------------------
+
+	include	inst.aud
+
+;-------------------------------
+;       
+;    Audio Subroutines
+;
+;-------------------------------
+
+	if 0
+
+;-------------------------------
+; 	duty sweeps
+;-------------------------------
+
+
+dtysw1
+	;ldy     #$04
+	;db      $2c             ;??bit nn?
+	jr      dmgjr1
+
+dtysw0				;sweep duty by every frame
+	;ldy     #$02
+	ld      e,2
+
+dmgjr1  ;lda     ctshad,x                ;ctrl register shadow
+	ld      hl,ctshad
+	add     hl,de
+	ld      a,(hl)
+	;and     #$3f
+	and     $3f
+	;sta     synct0
+	ld      (synct0),a
+	;lda     timer
+	ld      a,(timer)
+
+dtyl1
+	;dey
+	dec     e
+	;bmi     dtys1
+	bit     7,e
+	jr      nz,dtys1
+	;lsr     a
+	srl     a
+	;bpl     dtyl1           ;jmp..
+	bit     7,a
+	jr      z,dtyl1
+dtys1
+	;and     #$07
+	and     $07
+	;tax
+	ld      c,a
+	;lda     duties,x
+	ld      hl,duties
+	add     hl,bc
+	ld      a,(hl)
+	;ldx     driver
+	ld      hl,driver
+	ld      c,(hl)
+	;ora     synct0
+	ld      hl,synct0
+	or      (hl)
+	;sta     ctshad,x
+	ld      (ctshad),a
+ctrla1
+	;rts
+	ret
+
+duties			;sweep through these duties
+	db	dty2,dty3,dty1,dty0,dty1,dty2,dty3,dty0
+
+;--------------------------------
+; vibrato frequency bends
+;--------------------------------
+
+fqbnd2
+	scf
+	ld      e,$07
+	ld      a,e
+	or      a
+	jr      nz,fqentr2
+
+fqbnd1
+	;ldy     #$07            ;tight downward
+	ld      e,$07
+	;bne     fqentr
+	ld      a,e
+	or      a
+	jr      fqentr
+fqbnd0				;bend frequency
+	;ldy     #$0f            ;loose
+	ld      e,$0F
+fqentr
+	;clc
+	or      a               ;clear carry
+fqentr2
+	;php
+	push    af
+	;sty     synct1
+	ld      hl,synct1
+	ld      (hl),c
+	;lda     pitch,x
+	ld      hl,pitch
+	add     hl,bc
+	ld      a,(hl)
+	;asl     a
+	sla     a
+	;tay
+	ld      e,a
+	;lda     ptctab,y
+	ld      hl,ptctab
+	add     hl,de
+	ld      a,(hl)
+	;sta     synct0
+	ld      (synct0),a
+
+	;lda     timer
+	ld      a,(timer)
+	;nop
+	;nop
+	nop
+	nop
+	;and     synct1
+	ld      hl,synct1
+	and     (hl)
+	;tay
+	ld      e,a
+	;lda     synct0
+	;plp
+	pop     af
+	ld      a,(synct0)
+	;bcc     normb
+	jr      nc,normb
+	;clc
+	;adc     bends5,y
+	ld      hl,bends5
+	add     hl,de
+	add     a,(hl)
+	;jmp     fqstor
+	jp      fqstor
+normb
+	;adc     bends,y
+	ld      hl,bends
+	add     hl,de
+	add     a,(hl)
+fqstor
+	;sta     freqla,x
+	ld      hl,freqla
+	add     hl,bc
+	ld      (hl),a
+	;rts
+	ret
+bends				;bend offsets
+	db	0,-1,-2,-3,-3,-2,-1,0
+	db	0,01,02,03,03,02,01,0
+bends5
+	db	0,0,0,-1,0,0,0,+1
+
+;-------------------------------
+; tremolo volume bends
+;-------------------------------
+
+trmo1
+l0
+	;jmp     fqbnd2
+	jp      fqbnd2
+	;lda     ctshad,x
+	ld      hl,ctshad
+	add     hl,bc
+	ld      a,(hl)
+	;and     #$f0
+	and     $f0
+	;sta     synct0
+	ld      (synct0),a
+	;lda     timer
+	ld      a,(timer)
+	;and     #$07
+	and     $07
+	;tay
+	ld      e,a
+	;lda     ctshad,x
+	ld      hl,ctshad
+	add     hl,bc
+	ld      a,(hl)
+	;and     #$0f
+	and     $0f
+	;clc
+	;adc     trmotab,y
+	ld      hl,trmotab
+	add     hl,de
+	add     a,(hl)
+	;cmp     #$0f
+	cp      $0f
+	;bcc     l1
+	jp      c,l1
+	;lda     #$0f
+	ld      a,$0f
+l1
+	;ora     synct0
+	ld      hl,synct0
+	or      (hl)
+	;sta     ctshad,x
+	ld      hl,ctshad
+	add     hl,bc
+	ld      (hl),a
+	;jmp     fqbnd2
+	jp      fqbnd2
+;
+trmotab
+	db	$01,$00,$01,$00,$01,$00,$01,$00
+
+
+;------------------------------------------
+; pitch bend frequency bends
+;------------------------------------------
+
+pbnd1
+	;ldy     specnt,x
+	ld      hl,specnt
+	add     hl,bc
+	ld      a,(hl)
+	;cpy     #48
+	cp      48
+	;bcc     pbnd1a
+	jr      c,pbnd1a
+	;ldy     #48-1
+	ld      a,48-1
+pbnd1a
+	;lda     pb1tab,y
+	ld      e,a
+	ld      hl,pb1tab
+	add     hl,de
+	ld      a,(hl)
+	;sta     freqla,x
+	ld      hl,freqla
+	add     hl,bc
+	ld      (hl),a
+
+	ret
+;
+pb1tab
+	db	128,122,116,110,105,098,093,098,105,110,116,122
+	db	128,122,116,110,105,098,093,098,105,110,116,122
+	db	128,122,116,110,105,098,093,098,105,110,116,122
+	db	128,122,116,110,105,098,093,098,105,110,116,122
+;
+pbnd2
+	;lda     specnt,x
+	ld      hl,specnt
+	add     hl,bc
+	ld      a,(hl)
+	;lsr     a
+	;lsr     a
+	srl     a
+	srl     a
+	;tay
+	ld      e,a
+	;cpy     #20
+	cp      20
+	;bcc     pbnd2a
+	jr      c,pbnd2a
+	;ldy     #20-1
+	ld      e,20-1
+pbnd2a
+	;lda     pb2tab,y
+	ld      hl,pb2tab
+	add     hl,de
+	ld      a,(hl)
+	;sta     freqla,x
+	ld      hl,freqla
+	add     hl,bc
+	ld      (hl),a
+	;rts
+	ret
+;
+pb2tab
+	db	43,43,43,43,43,43,45,48,50,53
+	db	55,58,60,63,65,68,70,73,75,78
+
+	endif
+;
+;----------------------------------------------------------------------------
+;
+musicend
+musicsize	equ	musicend-musicstart
+;
+;
+
+

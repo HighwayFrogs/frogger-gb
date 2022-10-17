@@ -1,0 +1,136 @@
+;system equates
+
+:p1      equ     $FF00           ;key port
+:sb      equ     $FF01           ;serial data
+:sc      equ     $FF02           ;serial control
+:div     equ     $FF04           ;divider
+:tima    equ     $FF05           ;timer register
+:tma     equ     $FF06           ;modulo register
+:tac     equ     $FF07           ;timer control
+:.if     equ     $FF0F           ;interrupt request flag
+:NR51	 equ	 $FF25
+:ie      equ     $FFFF           ;interrupt acknowledge flag
+lcdc     equ     $FF40           ;lcd control
+:stat    equ     $FF41           ;lcdc status
+:scy     equ     $FF42           ;scroll-x
+:scx     equ     $FF43           ;scroll-y
+:ly      equ     $FF44           ;lcdc-y position
+:lyc     equ     $FF45           ;ly compare register
+:dma     equ     $FF46           ;dma transfer
+:bgp     equ     $FF47           ;bg palette
+:obp0    equ     $FF48           ;obj palette-0
+:obp1    equ     $FF49           ;obj palette-1
+:wy      equ     $FF4A           ;window y-position
+:wx      equ     $FF4B           ;window x-position
+
+;       dma
+
+:dmasub  equ     $FF80           ;dma transfer subroutine
+:objram  equ     $C000           ;oam buffer
+
+
+;Vectors and Nintendo registration data
+
+
+	org     $00
+	reti
+
+	org     $30		;RST30
+	if (EMULATE)
+	jp	$E206		;For development system "break"
+	endif
+
+	org     $40		;Vertical Blanking interrupt
+	jp      vblank
+
+	org     $48		;LCDC status interrupt
+	jp	lcdcirq
+
+	org     $50		;Timer interrupt
+	reti
+
+	org     $58		;SIO interrupt
+	reti
+
+	org     $60		;Key input interrupt
+	if (EMULATE)
+	call	$E203		;For development system
+	endif
+	reti
+
+	org     $100
+	nop
+	jp      g	
+
+
+;Nintendo Character data
+	db	$ce,$ed,$66,$66
+	db	$cc,$0d,$00,$0b
+	db	$03,$73,$00,$83
+	db	$00,$0c,$00,$0d
+	db	$00,$08,$11,$1f
+	db	$88,$89,$00,$0e
+	db	$dc,$cc,$6e,$e6
+	db	$dd,$dd,$d9,$99
+	db	$bb,$bb,$67,$63
+	db	$6e,$0e,$ec,$cc
+	db	$dd,$dc,$99,$9f
+	db	$bb,$b9,$33,$3e
+;Game Title
+;$134-$143
+	db	"FROGGER",0,0,0
+	db	$00,$00,$00,$00
+	db	$00,$00
+
+;maker code	$144-$145	NOTE -- must be ASCII encription of hex digit
+	db	$35,$47
+
+;sgb function code	$146
+
+	db	$00
+
+;Cartridge Type	$147
+	db	$01		;0:Rom only, 1:ROM+MMC, 2:ROM+MBC+Backup RAM
+;ROM Size   $148
+	if	meg1
+	db	$02		;0:256k, 1:512k, 2:1M, 3:2M, 4:4M
+	endif
+	if	meg4
+	db	4
+	endif
+
+;RAM Size	$149
+	db	$00		;0:None, 1:16k, 2:64k, 3:256k
+
+;
+
+;Destination Code   $14a
+	db	1
+;
+
+; location $14b
+
+	db	$33
+
+;Version Number	$14c
+	db	$00
+
+
+;Complement Check   sum of $134-$14c+$14d+$19 = 0
+
+	if meg1
+	db	$28		;Complement values of sum of data for 134H
+	endif
+	if meg4
+	db	$26
+	endif
+
+
+;Check-Sum $14e-$14f, hi,lo
+	db	$58,$92		;Check-sum of program ROM (Check-sum should
+				;be calculated with 00H for this data, and
+				;it should be set here.)
+;The next byte is at address $150
+
+	end
+

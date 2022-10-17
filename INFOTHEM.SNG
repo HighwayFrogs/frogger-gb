@@ -1,0 +1,37 @@
+;****************************************
+;* info theme music	              	*
+;****************************************
+;
+in1start
+;
+;	measure list
+;	-------------------------
+;      	"ml"	sn	sq	d
+;
+;	measure
+;	---------------------------------
+;	"m"	mn	sn	sq	d
+;
+s1d1sl
+	dw	ml111
+	dw	sloop0
+s1d2sl
+	dw	ml113
+	dw	sloop0
+s1d3sl
+	dw	ml112
+	dw	sloop0
+s1d4sl
+	dw	ml114
+	dw	sloop0
+;
+	ifdef	devapd
+	include	info\infothem.sq1
+	else
+	include	infothem.sq1
+	endif
+;
+in1end
+in1size	equ	in1end-in1start
+;
+;

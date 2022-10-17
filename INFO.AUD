@@ -1,0 +1,146 @@
+;****************************************
+;* "INFO" MUSIC				*
+;****************************************
+;
+;	Alex P. DeMeo
+;
+;--------------------------------------
+;
+dmabase	equ	$c000	;dma sweep address base
+cindex  .SET     $01
+;
+				;bassd1	equ	cindex
+				;cindex  .SET     cindex+1
+;
+				;bassd2	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;bassd3	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;clshi1	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;clshi2	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;cowbl1	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;cymbl1	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;cymbl2	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;cymbl3	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;cymbl4	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;cymbl5	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;cymbl6	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;cymbl7	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;lcong1	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;lcong2	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;lcong3	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;lcong4	equ	cindex
+				;cindex .SET     cindex+1
+;
+				;snare1	equ	cindex
+				;cindex  .SET     cindex+1
+;
+				;hitom1	equ	cindex
+				;cindex  .SET     cindex+1
+;
+				;hicng1	equ	cindex
+				;cindex  .SET     cindex+1
+;
+				;lotom1	equ	cindex
+				;cindex  .SET     cindex+1
+;
+				;mitom1	equ	cindex
+				;cindex  .SET     cindex+1
+;
+				;timba1	equ	cindex
+;
+;
+;--------------------------------------
+;
+	include	audiodrum.dmg
+;
+;
+;--------------------------------------
+;
+instyp					;instrument initial control data
+;
+info1ins
+	db	dty1			;theme
+	db	dty2
+	db	dty2
+;
+;--------------------------------------
+;
+;
+instab				;pointers to instrument envelope data
+;
+	dw	ev100		;theme
+	dw	ev110	
+	dw	ev110	
+;
+;--------------------------------------
+;
+envlen				;length of envelope data
+;
+ 	db	ev100x-ev100		;theme
+ 	db	ev110x-ev110
+ 	db	ev110x-ev110
+;
+;--------------------------------------
+;	THEME
+;
+ev100
+	db	$a8
+	db	sustok,$00
+	db	$40
+ev100x
+;
+ev110
+	db	$64
+	db	sustok,$00
+	db	$40
+ev110x
+;
+;
+mute	equ	$-4
+	db	$00,$00,$ff,$ff
+;
+;--------------------------------------
+;
+	if	song1
+;
+	ifdef	devapd
+	include	info\infothem.sng	;theme music
+	else
+	include	infothem.sng		
+	endif
+;
+	endif
+;
+;--------------------------------------
+;
+;
+

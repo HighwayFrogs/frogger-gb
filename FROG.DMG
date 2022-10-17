@@ -1,0 +1,204 @@
+
+; FROGGER
+; Started 1 May 1998
+; Author -- David Lubar
+; 
+
+prodrom	equ	1	;final version, no cheats
+meg1	equ	1	;real size
+meg4	equ	0	;for current rom burner
+audio	equ	1
+rom	equ	1
+	
+Wholegame	equ	1	;flag for leaving off title page, etc.
+
+	if wholegame
+devel		equ	0
+	else
+devel		equ	1	;cheats, etc.
+	endif
+
+EMULATE	equ	0	;1-emulator, 0-ROM
+
+
+	if (EMULATE == 0)
+	list
+
+;MyMessage - ROM assemble
+
+	nolist
+	endif
+
+
+	include 	macros
+	include		system	;system equates and vectors
+	include		equ	;program equates
+	include 	frogdef.snd
+	include		init
+	include	 	main
+	include		subs
+	include 	util
+	include		decmprs
+	include		frogsubs	;game-specific code
+	include		data.dmg
+endb0
+chk_bank0
+	thisbank 1
+	org	$4000
+
+	include		grfx
+	include		title.dmg	;title, credits, etc
+
+
+
+endb1
+
+
+;bank 2
+	thisbank 2
+	org	$4000
+
+; Music and sound jump table interface
+
+music	ds	3
+setseq	ds	3
+sndoff	ds	3
+sound	ds	3
+setsnd	ds	3
+killid	ds	3
+
+	org	$6000		;reserve 8K- for music handler
+
+endb2
+
+
+; bank 3
+	thisbank 3
+	org	$4000
+titlescreen
+	includeraw	title.raw
+readyscreen
+	includeraw	ready.raw
+;goverscreen
+;	includeraw	gover.raw
+endb3
+
+	thisbank 4
+	org $4000
+
+;
+; logo screens are NIN files with raw header
+;
+logo1scrn
+	includeraw	logo1.raw
+logo2scrn
+	includeraw	logo2.raw
+
+
+endb4
+
+	thisbank 5
+	org $4000
+hs	includeraw	hs-bw.raw
+ko	includeraw	ko-bw.raw
+
+
+endb5
+
+	thisbank 6
+endb6
+
+	thisbank 7
+	org	$4000
+	
+	if	 rom
+	nop  		;force full binary image
+	endif
+
+endb7
+
+	if	meg4
+	thisbank $1f
+	org	$4000
+	
+	nop  		;force full binary image
+
+
+endb1f
+	endif
+
+
+	thisbank -1
+	otherbank 1
+
+
+	dumpsym	base.sym		;Dump all symbols
+
+
+
+
+;Error messages (Others are in seperate assemblies)
+
+	if (ram_top > $de00)
+	pseudwarn Overflow - Work RAM space exceeded
+	endif
+
+	if (iram_end > $FFFF) || (iram_end < $1000)
+	pseudwarn Overflow - Internal RAM space exceeded
+	endif
+
+	if (chk_bank0 > $4000)
+	pseudwarn Overflow - Bank 0 code past end of bank 0
+	endif
+
+	if (0+endb1 > $8000)
+	pseudwarn Overflow - Main code ("banks" 0 and 1 - low) exceeds $8000
+	nolist
+	endif
+
+	if (0+endb2 > $8000)
+	pseudwarn Overflow - Bank 2 data exceeds $8000
+	endif
+
+	if (0+endb3 > $8000)
+	pseudwarn Overflow - Bank 3 data exceeds $8000
+	endif
+
+	if (0+endb4 > $8000)
+	pseudwarn Overflow - Bank 4 data exceeds $8000
+	endif
+
+	if (0+endb5 > $8000)
+	pseudwarn Overflow - Bank 5 data exceeds $8000
+	endif
+
+	if (0+endb6 > $8000)
+	pseudwarn Overflow - Bank 6 data exceeds $8000
+	endif
+
+	if (0+endb7 > $8000)
+	pseudwarn Overflow - Bank 7 data exceeds $8000
+	endif
+
+
+
+
+	list
+; Bytes remaining:
+l0	equ	0+$4000-endb0		;bank 0
+l1	equ	0+$8000-endb1		;bank 1
+l2	equ	0+$8000-endb2		;bank 2
+l3	equ	0+$8000-endb3		;bank 3
+l4	equ	0+$8000-endb4		;bank 4
+l5	equ	0+$8000-endb5		;bank 5
+l6	equ	0+$8000-endb6		;bank 6
+l7	equ	0+$8000-endb7		;bank 7
+
+
+
+	nolist
+
+	end
+
+
+

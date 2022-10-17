@@ -1,0 +1,129 @@
+;Utility routines
+;Mark Klein
+
+;Call a subroutine indirect through (hl)
+;The subroutine's ret will return to the caller of this routine
+
+thru_hl	jp	(hl)
+
+;LCDC stop
+;Author: Nintendo / Mark Klein
+;Entry:	none
+;Return: none
+;Uses: a
+
+lcd_off
+	ld	a,(LY)		;See if LCD is already off
+	ld	b,a
+	ld	c,0
+llp2	ld	a,(LY)
+	cp	b
+	jr	nz,lison
+	inc	c
+	ret	z		;If c wraps, return - lcd is already off
+	jr	llp2
+
+lison	ld	a,(IE)		;Interrupt acknowlege (Enable) flags
+	push	af
+	res	0,a		;Prohibit v-blank interrupt
+	ld	(IE),a
+lcd_lp	ld	a,(LY)		;Wait v-blank
+	cp	145		;Check for Line 145
+	jr	nz,lcd_lp
+	ld	a,(LCDC)	;Stop lcdc
+	and	%01111111	;Stop Controller
+	ld	(LCDC),a
+	pop	af
+	ld	(IE),a
+	ret
+
+;Turn LCD on
+;Author: Mark Klein
+;Entry:	none
+;Return: none
+;Uses: a
+
+
+lcd_on	ld      a,(IE)		;Interrupt acknowlege (Enable) flags
+	push	af		;Save interrupts for restoring below
+	xor	a		;Turn off all interrupts
+	ld      (IE),a
+
+	ld      a,(LCDC)
+	or	%10000000	;Turn on controller
+	ld      (LCDC),a	;Restore entry obj and bg state
+
+	pop	af
+	ld      (IE),a		;Restore interrupts
+	ret
+
+;Move block
+;Entry:
+;	hl - Source addr
+;	de - Destination addr
+;	bc - Size
+;Return:
+;	hl - Points past transferred data block, source
+;	de - Points past transferred data block, destination
+;Used: a,bc,de,hl
+
+block_move
+blk_move
+	ld      a,(hli)
+	ld      (de),a
+	inc     de
+	dec     bc
+	ld      a,b
+	or      c
+	jr      nz,blk_move
+	ret
+
+;Get a byte from a list
+;Author: Mark Klein
+;Entry: getbyte
+;	hl - pointer to the list
+;	a - index
+;Entry: getbyte_c
+;	hl - pointer to the list
+;	c - index
+;Return:
+;	a - the byte
+;	hl - points to the returned byte
+;Used:	a
+
+getbyte_c
+	ld	a,c
+getbyte	add	a,l		;Add the index into the pointer, low byte
+	ld	l,a
+	jr	nc,rbnob
+	inc	h		;If carry, increment high byte of pointer
+rbnob	ld	a,(hl)		;Get the byte
+	ret
+
+;Get a word from a list
+;Author: Imagineering / Mark Klein
+;Entry: getword
+;	hl - pointer to the list of words
+;	a - index
+;Entry: getbyte_c
+;	hl - pointer to the list
+;	c - index
+;Return:
+;	hl - the word
+;Used:	a, hl
+
+getword_c
+	ld	a,c
+getword	push	bc
+	ld	b,0		;setup hi byte of offset
+	add	a,a		;adjust index for 2-byte table
+	rl	b		;account for possible carry
+	ld	c,a		;lo byte of offset
+	add	hl,bc		;adjust ptr by offset
+	ld	a,(hli)		;Get low byte from list
+	ld	h,(hl)		;Get hi byte
+	ld	l,a
+	pop	bc
+	ret
+
+

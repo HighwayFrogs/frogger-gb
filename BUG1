@@ -1,0 +1,51 @@
+GAMEBOY FROGGER - BUGS AND COMMENTS
+
+#    ID#  Class     Status    Verify    Description
+001  001  A              Sometimes the Lady Frog is not visible on
+a log,                        yet when you jump onto a log you hear
+the sound                          cue of Frogger picking up the
+Lady Frog and                           Frogger starts flashing.
+Basically, the Lady Frog                          is sometimes not
+displayed.     
+
+002  002  A              The sound of the time bar at the bottom of
+the                           screen does not always play.
+Sometimes you here                      the sound and sometimes you
+don't. Awaiting new                          sound.
+
+003  003  A              The game is too hard and needs to be
+tweaked. Game                      starts to get unfair starting at
+level 4. It is                          impossible to get past
+level 6 without the cheat.
+
+004  004  A              Remove cheat code from program. Holding
+down A & B 
+                         buttons when powering up GameBoy corrupts
+the word
+                         Licensed on the title screen.
+
+005  005  A              Code needs to be registered. ASCII code
+for the                       Game Title has not been entered.
+Destination code                        is now set to 00H and it
+should be 01H. Check                              GameBoy
+Development Manual for correct entries.
+
+006  006  B              When you hop or scroll off the right side
+of the                        screen, you do not hear the die sound
+or see the                         skull graphic as you do when you
+go off the left                         side of the screen.
+
+007  007  B              The shadow of the second row of trucks on
+level                         one extend 1 pixel too high and can
+be seen in                              front of windshield. 
+
+008  008  A              Incorporate a Majesco and Morning Star
+Multimedia                         logo screens before Title
+screen. The words                            Licensed by Nintendo
+need to appear on the Legal                       screen as well.
+
+009  009  A              Incorporate a new credit screen with my
+name as:                      TESTING: ROBERT PRESCOTT
+
+
+

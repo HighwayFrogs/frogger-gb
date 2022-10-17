@@ -1,0 +1,828 @@
+;****************************************
+;*								*
+;*             INST.AUD		    		*
+;*								*
+;*     GameBoy Instrument Drivers       *
+;*								*
+;*	GameBoy Music Sub-System		*
+;*	    							*
+;* Copyright (c) 1991 Imagineering, Inc.*
+;*	    							*
+;****************************************
+;
+;
+;    Prepared for Imagineering, Inc. by
+;    
+;	Stuart E. Ross
+;	New Potato Technologies
+;	P.O. Box 187
+;	Danbury, CT  06813
+;
+;	TEL:  (203) 746-9040
+;	FAX:  (203) 746-6929
+;
+;
+;--------------------------------------
+
+inststart					; size start
+
+;-------------------------------
+;     Instrument Equates
+;-------------------------------
+
+I_DRUMKIT	equ	$00
+I_BASIC		equ	$01
+I_PLUKBASS	equ	$02
+I_PLUKBASSX	equ	$03
+I_PLUKSTR1	equ	$04
+I_PLUKSTR2	equ	$05
+I_PLUKSTRX	equ	$05
+I_VIBE1		equ	$06
+I_VIBE2		equ	$07
+I_VIBE3		equ	$08
+
+;-------------------------------
+;     Instrument Directory
+;-------------------------------
+
+inst_init
+
+	dw	drum_kit		; I_DRUMKIT	
+	dw	basic_init		; I_BASIC		
+	dw	plukbass_init	; I_PLUKBASS	
+	dw	plukbassX_init	; I_PLUKBASSX
+	dw	plukstr1_init	; I_PLUKSTR1	
+	dw	plukstr2_init	; I_PLUKSTR2	
+	dw	plukstrX_init	; I_PLUKSTRX	
+	dw	basic_init		; I_VIBE1		
+	dw	basic_init		; I_VIBE2		
+	dw	basic_init		; I_VIBE3		
+
+inst_play
+
+	dw	null_inst		; I_DRUMKIT	
+	dw	basic_play		; I_BASIC		
+	dw	null_inst		; I_PLUKBASS	
+	dw	null_inst		; I_PLUKBASSX
+	dw	null_inst		; I_PLUKSTR1	
+	dw	null_inst		; I_PLUKSTR2	
+	dw	null_inst		; I_PLUKSTRX	
+	dw	vibe1			; I_VIBE1		
+	dw	vibe2			; I_VIBE2		
+	dw	vibe3			; I_VIBE3		
+
+
+;-------------------------------
+;	NULL Instrument
+;-------------------------------
+
+null_inst					; do nothing
+
+	ret
+
+;-------------------------------
+;       
+;	Basic Instrument
+;       
+;	Sound 1, 2, 3
+;       
+;-------------------------------
+
+;	basic instrument init routine
+
+basic_init					; start a note
+
+;       lookup pitch for this voice
+
+	ld	a,dty2			; set duty cycle
+	call	stuff_duty
+
+	call	set_pitch		; fetch standard pitch
+
+	ld	hl,vol			; fetch volume for this driver
+	add	hl,bc
+	ld	a,(hl)
+	call	stuff_vol
+
+	call	set_stereo		; set pan
+
+	jp  	note_on			; hit it!
+
+
+;	basic instrument play routine
+
+
+basic_play					; play a note
+
+	ld      hl,envcnt       ; fetch event length count for this driver
+	add     hl,bc
+
+	ld      a,(hl)			; done with this event?
+	cp	0
+	ret	z
+
+	dec	(hl)	       	; update event length count
+	ret	nz
+
+	jp	note_off		; clocked out, turn it off!
+
+
+;-------------------------------
+;       
+;	Pluk BASS Instrument
+;       
+;	Sound 1, 2, 3
+;       
+;-------------------------------
+
+plukbassx_init					; start a stereo note
+
+	call 	note4_pan
+	jr	plukbass0
+
+plukbass_init					; start a note
+
+	call	set_stereo		; set pan
+
+;       lookup pitch for this voice
+
+plukbass0
+
+	ld	a,dty2			; set duty cycle
+	call	stuff_duty
+
+	call	set_pitch		; fetch standard pitch
+
+	ld	hl,vol			; fetch volume for this driver
+	add	hl,bc
+	ld	a,(hl)
+
+	or	$01				; envelope speed
+
+	call	stuff_vol
+
+	jp  	note_on			; hit it!
+
+
+;-------------------------------
+;       
+;	Pluk String Instrument
+;       
+;	Sound 1, 2, 3
+;       
+;-------------------------------
+
+plukstrx_init					; start a stereo note
+
+	call 	note4_pan
+
+	ld	a,dty3			; set duty cycle
+	jr	plukstr
+
+plukstr1_init					; start a note
+
+	call	set_stereo
+
+	ld	a,dty3			; set duty cycle
+	jr	plukstr
+
+plukstr2_init					; start a note
+
+	call	set_stereo
+
+	ld	a,dty0			; set duty cycle
+;
+
+plukstr	call	stuff_duty		; set duty cycle
+
+;       lookup pitch for this voice
+
+	call	set_pitch		; fetch standard pitch
+
+	ld	hl,vol			; fetch volume for this driver
+	add	hl,bc
+	ld	a,(hl)
+
+	or	$02				; envelope speed
+
+	call	stuff_vol
+
+	jp  	note_on			; hit it!
+
+;---------------------------------------
+;
+;    Standard Vibrato Routine
+;
+;    bc - driver to update freq modulation
+;    hl - base of modulation table
+;    e  - index modulo mask
+;
+;---------------------------------------
+
+;--------------------------------
+; vibrato frequency bends
+;--------------------------------
+
+vibe1					; freq mod table add
+	ld      hl,bends	; index modulo mask
+	ld      a,$0F
+	jr	vibrato
+
+vibe2
+	ld      hl,bendf	; freq mod table address
+	ld      a,$07 		; index modulo mask
+	jr      vibrato
+
+vibe3
+	ld      hl,bendx	; freq mod table address
+	ld      a,$07 		; index modulo mask
+;
+
+vibrato
+
+	push	hl			; save table base
+
+	ld      hl,synct1	; save index modulo mask
+	ld      (hl),a
+
+;	done with this event?
+
+	ld      hl,envcnt   ; fetch event length count for this driver
+	add     hl,bc
+
+	ld      a,(hl)		; done with this event?
+	cp	0
+	jp	nz,vibrax
+
+	pop	hl			; all quiet
+	ret
+
+vibrax	dec	(hl)	    ; update event length count
+	jp	nz,vibrate
+
+	pop	hl			; clocked out, turn it off!
+	jp	note_off	
+
+;	setup vibrato
+
+vibrate	ld      hl,pitch	; fetch current pitch
+	add     hl,bc
+	ld      a,(hl)
+	sla     a			; index words
+	ld      e,a
+
+	ld      hl,ptctab	; fetch low 8 bits of standard pitch value
+	add     hl,de
+	ld	a,(hl)
+	ld	(synct0),a
+
+	ld      a,(npt_clk)	; make vibrato freq mod index
+
+	ld      hl,synct1	; apply index mask
+	and     (hl)
+
+	ld      e,a			; index to freq mod table
+
+	ld      a,(synct0)	; fetch low byte of freq
+
+	pop	hl			; recover table address
+
+	add     hl,de		; add in offset
+	add     a,(hl)
+
+	ld	(sndtmp),a	; save new value
+
+;	mod frequency value in sound channel
+
+	ld      hl,sndposmsk	; driver in use?
+	add	hl,bc
+	ld	a,(sndlock)	
+	and	(hl)
+	jp	nz,basic_play
+
+	ld	hl,nrx3tab		; set register
+	add	hl,bc
+	ld	a,(hl)
+	ld	e,a
+	ld	d,$FF
+
+	ld	a,(sndtmp)		; recover mod value
+	ld	(de),a			; stuff it!
+
+	ld	d,0				; you know...
+
+	jp	basic_play
+;
+
+nrx3tab db	low nr13, low nr23, low nr33
+
+; 	vibrato offset tables
+
+bends
+	db	0,-1,-2,-3,-3,-2,-1,0
+	db	0,01,02,03,03,02,01,0
+
+bendf
+	db	0,-1,-2,-1,-0, 1, 2, 1
+
+;bendx
+;	db	0,0,0,-1,0,0,0,+1
+
+bendx
+	db	1,-1,1,-1,1,-1,1,-1
+
+
+;---------------------------------------
+;
+;    SET_STEREO
+;
+;    fix current pan settings for this driver
+;
+;    bc - driver to update pan
+;
+;---------------------------------------
+
+set_stereo
+
+	ld      hl,sndposmsk	; driver in use?
+	add	hl,bc
+	ld	a,(sndlock)	
+	and	(hl)
+	ret	nz
+
+	ld	hl,negpanmsk 	; fetch pan mask for this driver
+	add	hl,bc
+	ld	a,(nr51)		; clear current status
+	and	(hl)
+	push	af
+
+	ld	hl,pospanmsk	; fetch pan mask for this driver
+	add	hl,bc
+	ld	a,(stereo)		; fetch default pan value
+	and	(hl)
+	ld	e,a
+
+	pop	af				; combine current pan
+	or	e
+	ld	(nr51),a
+
+	ret
+
+pospanmsk db $11, $22, $44, $88
+negpanmsk db $EE, $DD, $BB, $77
+
+;---------------------------------------
+;
+;    Standard 4 cycle pan routine
+;
+;    bc - driver to update pan
+;
+;---------------------------------------
+
+note4_pan
+
+	ld      hl,sndposmsk	; driver in use?
+	add	hl,bc
+	ld	a,(sndlock)	
+	and	(hl)
+	ret	nz
+
+	ld	hl,mentron+1	; clk is metronome / 24
+	ld	a,(hl)
+
+	sra	a				; 96 -> 48
+	sra	a				; 48 -> 24
+	sra	a				; 24 -> 12
+
+	cp	3				; cyce 1?
+	jr	nc,n4_2
+
+	ld	e,0			
+	jr	note4_panit
+
+n4_2	cp	6				; cycle 2?
+	jr	nc,n4_3
+
+	ld	e,1			
+	jr	note4_panit
+
+n4_3	cp	9				; cycle 3?
+	jr	nc,n4_4
+
+	ld	e,2			
+	jr	note4_panit
+
+n4_4	ld	e,3			
+
+note4_panit
+
+	ld	hl,negpanmsk	; fetch pan mask for this driver
+	add	hl,bc
+	ld	a,(nr51)		; clear old status
+	and	(hl)
+	push	af
+
+	ld	hl,pantab4		; fetch current pan value
+	add	hl,de
+	ld	a,(hl)
+
+	ld	hl,pospanmsk	; fetch pan mask for this driver
+	add	hl,bc
+	and	(hl)
+	ld	e,a
+
+	pop	af				; combine current pan
+	or	e
+	ld	(nr51),a
+
+	ret
+
+pantab4	db $ff, $0f, $ff, $f0
+
+
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+;
+;	Generalized Driver Routines
+;
+;-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+
+;---------------------------------------
+;
+;    Set Standard Pitch
+;
+;    bc - driver to initialize pitch
+;
+;---------------------------------------
+
+set_pitch
+
+	ld      hl,pitch        ; fetch pitch number
+	add     hl,bc
+	ld      e,(hl)
+	sla     e               ;index words
+
+	ld      hl,ptctab       ;pitch table base addr into hl
+	add     hl,de           ;add index to base
+	ld      e,(hl)          ;low into e
+	inc     hl
+	ld      d,(hl)          ;high into d
+
+	ld      hl,freqla       ;shadow freq low
+	add     hl,bc
+	ld      (hl),e
+
+	ld      hl,freqha       ;save freq hi
+	add     hl,bc
+	ld      (hl),d
+
+	ld      d,0             ;repair D reg
+
+	ret
+
+ptctab				  		;scale pitches
+
+	dw	an1v,as1v,bn1v						;first octave
+	dw	cn2v,cs2v,dn2v,ds2v,en2v,fn2v		;second octave
+	dw	fs2v,gn2v,gs2v,an2v,as2v,bn2v
+	dw	cn3v,cs3v,dn3v,ds3v,en3v,fn3v		;third octave
+	dw	fs3v,gn3v,gs3v,an3v,as3v,bn3v
+	dw	cn4v,cs4v,dn4v,ds4v,en4v,fn4v		;fourth octave
+	dw	fs4v,gn4v,gs4v,an4v,as4v,bn4v
+	dw	cn5v,cs5v,dn5v,ds5v,en5v,fn5v		;fifth octave
+	dw	fs5v,gn5v,gs5v,an5v,as5v,bn5v
+	dw	cn6v,cs6v,dn6v,ds6v,en6v,fn6v		;sixth octave
+	dw	fs6v,gn6v,gs6v,an6v,as6v,bn6v
+	dw	rstv								;rest frequency (silence)
+	
+;--------------------------------------
+;       
+;  Stuff shadow duty into sound channel
+;
+;	bc - sound channel to hit
+;	a  - duty value
+;
+;--------------------------------------
+
+stuff_duty
+
+	ld	e,a				; save duty value
+
+	ld      hl,sndposmsk	; driver in use?
+	add	hl,bc
+	ld	a,(sndlock)	
+	and	(hl)
+	ret	nz
+
+;       switch on driver number
+
+l0
+	ld      a,c             ;get driver #
+
+	cp      0               ; snd 0
+	jr      z,dr1d
+
+	cp      1				; snd 1
+	jr      z,dr2d
+
+	ret
+
+;	Stuff values for sound 1
+
+dr1d	ld	a,e             ; get duty
+	ld      (nr11),a        ; set
+	ret
+
+;	Stuff values for sound 2
+
+dr2d	ld	a,e
+	ld      (nr21),a
+	ret
+;
+
+
+;--------------------------------------
+;       
+;   Stuff volume into sound registers
+;
+;	bc  - sound channel
+;	a   - volume level (0(off) - F(max))
+;
+;--------------------------------------
+
+stuff_vol
+
+	ld	e,a				; save vol value
+
+	ld      hl,sndposmsk	; driver in use?
+	add	hl,bc
+	ld	a,(sndlock)	
+	and	(hl)
+	ret	nz
+
+volset
+
+;       switch on driver number
+
+	ld      a,c             ; get driver #
+
+	cp      0				; snd 1
+	jr      z,dr1v
+
+	cp      1				; snd 2
+	jr      z,dr2v
+
+	cp      2				; snd 3
+	jr      z,dr3v
+
+	ld      d,0             ; repair D
+	ret
+
+;	driver for sound 1
+
+dr1v
+	ld	a,e             ; set envelope initial gain
+	ld      (nr12),a
+
+	ld	a,0				; clear sweep register
+	ld	(nr10),a
+
+	ret
+
+;	driver for sound 2
+
+dr2v
+	ld	a,e             ; set envelope initial gain
+	ld      (nr22),a
+
+	ret
+
+;	driver for sound 3
+
+dr3v
+	ld	hl,vol2nr3		; convert gain value
+	ld	a,e              
+	swap	a
+	and	$0f				; defend against envelope spec
+	ld	e,a
+	add	hl,de
+	ld	a,(hl)
+
+	ld      (nr32),a		; set envelope initial gain
+
+	ret
+
+;	driver for sound 4
+
+dr4v
+	ld	a,e             ; set envelope initial gain
+	ld      (nr32),a
+
+	ret
+;
+
+vol2nr3      					; volume conversion table
+	db      $00,$60,$60,$60
+	db	$60,$60,$40,$40
+	db	$40,$40,$40,$20
+	db	$20,$20,$20,$20
+
+;----------------------------------------------
+;       
+;    NOTE_ON
+;
+;    Stuff shadow freq into sound channel
+;    Initilize sound channel to operate
+;
+;    bc - sound channel to hit
+;
+;----------------------------------------------
+
+note_on
+
+	ld      hl,sndposmsk	;driver in use?
+	add	hl,bc
+	ld	a,(sndlock)	
+	and	(hl)
+	ret	nz
+
+;       Index to the data
+
+	ld      hl,freqha		;fetch base
+	add     hl,bc
+	ld      a,(hl)
+	push    af
+
+	ld      hl,freqla
+	add     hl,bc
+	ld      a,(hl)
+	push    af
+
+;       switch on driver number
+
+	ld      a,c             ;get driver #
+
+	cp      0				;Snd 1
+	jr      z,dr1non
+
+	cp      1				;Snd 2
+	jr      z,dr2non
+
+	cp      2				;Snd 3		
+	jr      z,dr3non
+
+	pop     af				;driver # x
+	pop     af
+	ret
+
+;	Stuff values for sound 1
+
+dr1non	pop     af
+	ld      (nr13),a
+	pop     af
+	or	%10000000
+	ld      (nr14),a
+	ret
+
+;	Stuff values for sound 2
+
+dr2non  pop     af
+	ld      (nr23),a
+	pop     af
+	or	%10000000
+	ld      (nr24),a
+	ret
+
+;	Stuff values for sound 3
+
+dr3non  pop     af
+	ld      (nr33),a
+	pop     af
+	or	%10000000
+	ld      (nr34),a
+	ret
+
+;----------------------------------------------
+;       
+;    NOTE_OFF
+;
+;    Silence! Event has finished
+;
+;	bc - sound channel to hit
+;
+;----------------------------------------------
+
+note_off
+
+	ld      hl,sndposmsk	; driver in use?
+	add	hl,bc
+	ld	a,(sndlock)	
+	and	(hl)
+	ret	nz
+
+;       switch on driver number
+
+gen_off
+
+	ld      a,c             ;get driver #
+
+	cp      0				; Snd 1
+	jr      z,dr1off
+
+	cp      1				; Snd 2
+	jr      z,dr2off
+
+	cp      2				; Snd 3		
+	jr      z,dr3off
+
+	jr	dr4off
+
+;	Stuff values for sound 1
+
+dr1off	ld	hl,nr13			; kill freq
+	jr	kill1
+
+;	Stuff values for sound 2
+
+dr2off	ld	hl,nr23			; kill freq
+	jr	kill2
+
+;	Stuff values for sound 3
+
+dr3off	ld	hl,nr33			; kill freq
+	jr	kill3
+
+;
+
+kill1
+	ld	a,$00			; fix sweep
+	ld	(nr10),a
+
+kill2
+kill3	
+	ld      a,$ff           ;get freq lo
+	ld      (hli),a         ;store
+	ld      a,$07           ;get freq hi
+	ld      (hl),a          ;store
+	ld      d,0             ;repair D
+	ret
+
+;	Stuff values for sound 4
+
+dr4off	xor	a				; kill vol
+	ld      (nr42),a
+	ret
+
+;-------------------------------------
+;
+;       Initiate a drum event
+;
+;-------------------------------------
+
+drum_kit
+	ld      hl,sndlock	    ;if voice 3 busy, exit
+	bit     3,(hl)
+	ret     nz
+
+	call	set_stereo		; set pan for this channel
+
+	ld      hl,pitch        ;fetch pitch/drum number
+	add     hl,bc
+
+	ld      a,(hl)			;get pitch index
+
+	cp	.rst			;skip if rest
+	ret	z
+
+	sla     a               ;index double words
+	sla     a
+	ld      e,a
+	ld      hl,drumtab
+	add     hl,de
+
+	ld      a,(hli)	        ;length register value
+	ld      (nr41),a
+
+	ld      a,(hli)	        ;envelope register value
+	ld      (nr42),a
+
+	ld      a,(hli)	        ;freq register value
+	ld      (nr43),a
+
+	ld      a,(hl)	        ;initial/length register value
+	ld      (nr44),a
+
+	ret
+
+;--------------------------------------------
+;
+;  Include drum kit available for music
+;
+;--------------------------------------------
+
+	include	audiodru.aud
+
+;
+;
+
+
+

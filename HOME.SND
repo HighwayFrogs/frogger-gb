@@ -1,0 +1,127 @@
+;****************************************
+;* 								*
+;*              HOME.SND				*
+;*		 						*
+;*	  "Home Alone - GameBoy" 		*
+;*								*
+;*   	      Sound Effects				*
+;*	       							*
+;* Copyright (c) 1991 Imagineering, Inc.*
+;*	       							*
+;****************************************
+;
+;
+;   Prepared for Imagineering, Inc. by
+;
+;   	Stuart E. Ross
+;   	New Potato Technologies
+;   	P.O. Box 187
+;   	Danbury, CT  06813
+;
+;   	TEL:  (203) 746-9040
+;   	FAX:  (203) 746-6929
+;
+
+;------------------------------------
+;
+;  Sound effect init vector table
+;
+;    One shot sounds are at top
+;
+;------------------------------------
+
+snd_init_tab	
+
+	dw	play_one_shot	; 0
+	dw	play_one_shot	; 1
+	dw	play_one_shot	; 2
+	dw	play_one_shot	; 3
+	dw	play_one_shot	; 4
+	dw	play_one_shot	; 5
+	dw	play_one_shot	; 6
+	dw	play_one_shot	; 7
+	dw	play_one_shot	; 8
+	dw	play_one_shot	; 9
+	dw	play_one_shot	; a
+	dw	play_one_shot	; b
+	dw	play_one_shot	; c
+	dw	play_one_shot	; d
+	dw	play_one_shot	; e
+
+;------------------------------------
+;
+;  Trigger data for one shot sounds
+;
+;------------------------------------
+
+one_shot_tab
+
+;		----- ---- ----     ---- ---- -------
+;		NR51  NR10 NR11     NR12 NR13 NR14
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+
+s_open		; 0- open a door or drawer
+
+	db	c4en, $00, $01,   	$f4, $50, $c1+ch4
+
+s_glitter	; 1-tooth glitter on game over
+
+	db	c1en, $76, dty3+$10,$c2, $70, $87
+
+s_boyhit  	; 2-boy takes a hit
+
+	db	c1en, $1c, dty3+$08, $f4, $80, $87+ch1
+
+s_enmyhit	; 3- enemy takes a hit
+
+	db	c1en, $1d, dty2+$04, $f2, $80, $87+ch1
+
+s_enmygone	; 4- enemy dead/gone
+
+	db	c1en, $c7, dty2+$20, $f3, $20, $86+ch1
+
+s_bosshit  	; 5- boss takes a hit
+
+	db	c1en, $1d, dty2+$04, $f2, $80, $86+ch1
+
+s_treasure	; 6- boy gets treasure
+
+	db	c1en, $75, $10, $f2, $00, $86+ch1
+
+s_boygets	; 7- boy gets shit
+
+	db	c1en, $74, $10, $f2, $00, $86+ch1
+
+s_dropchute	; 8- drop item into chute
+
+	db	c1en, $fe, dty1+$10, $c3, $00, $86+ch1
+
+s_objfall	; 9- general object falling sound
+
+	db	c1en, $ff, dty1+$10, $c7, $00, $c7+ch1
+
+s_thump		; a- general thump
+
+	db	c1en, $1d, dty2+$04, $e0, $80, $86+ch1
+
+s_oneup		; b- one-up sound
+
+	db	c1en, $00, dty3+$20, $f1, $c0, $c6+ch1
+
+s_button	; c- select and start key
+
+	db	c1en, $24, $80+$04, $80, $20, $c6+ch1
+
+s_bigboom	; d- big explosion
+
+	db	c4en, $00, $50, $f5, $54, $80+ch4
+
+s_bonus		; e- bonus award
+
+	db	c1en, $00, $c0+$08, $a1, $39, $87+ch1
+
+;
+
+

@@ -1,0 +1,122 @@
+collisions			;need to test for characters
+				;and for sprites
+	ld	a,(dying)
+	and	a
+	jr	z,docols
+	ret
+docols
+;get lane position first, then add scroll value to x value
+
+	ld	a,(frogy)
+	sub	$20		;adjust for sprite positioning ($10)
+				;and for highest position on screen
+	sra	a		; /8
+	sra	a
+	sra	a		;should be index into lane scrolls
+	ld	(froglane),a	;save for later use
+	ld	de,xlane-1	;offset since values are for next lane
+	add	a,e
+	ld	e,a
+	jr	nc,col2
+	inc	d
+col2
+	ld	a,(de)	;scroll position for this lane
+	ld	b,a
+	ld	a,(frogx)	
+	add	a,b
+
+	sub	6
+	srl	a		
+	srl	a
+	srl	a		;x/8
+	ld	bc,$9800	;point to screen
+	ld	c,a
+	
+; bc points to proper row, but now need to find column
+
+	ld	a,(frogy)
+	sub	$10		;adjust for sprite positioning
+				;(seems offset from screen values)
+	and	$f8		;lose lower 3 bits
+	ld	l,a
+	ld	h,0
+	add	hl,hl		;*2 (really * 16)
+	add	hl,hl		;*4
+	add	hl,bc		;add in screen start and x position
+	ld	b,h
+	ld	c,l
+
+col3
+	ld	hl,STAT
+	di
+l0
+	bit	1,(hl)
+	jr	nz,l0
+				;check out the collision character
+	ld	a,(bc)		;read SCREEN character
+	ei
+	
+	and	a		;empty character (blank, but also water)
+	jr	nz,notwater
+	ld	a,(froglane)
+	ld	b,a
+	cp	6
+	jr	nc,nocoll
+	ld	a,drown_s
+	ld	(nextsound),a
+     	jp	crush
+notwater
+	cp	CARS
+	jr	c,nocoll	;must be a safe character
+	cp	LOGS
+	jr	nc,dologs
+				;it's a car
+	ld	a,car_s
+	ld	(nextsound),a
+	ld	a,b		;frog lane
+	cp	6
+	jr	nc,crush		;really a car
+	ld	a,gator_s
+	ld	(nextsound),a
+crush
+	ld	a,(jumpcount)
+	and	a
+	jr	nz,nocoll
+	ld	a,$40
+	ld	(dying),a	;set flag to flash him (will be grfx later)
+
+	if audio
+gohere
+	ld	a,(nextsound)
+	call 	gsetsnd
+	endif
+
+	jr nocoll
+
+dologs
+	xor	a
+	ld	(loglane),a	;zero the flag that moves frog on log
+	ld	a,(jumpcount)	;might be able to make this global
+	and	a
+	jr	nz,nocoll
+
+	ld	a,(froglane)
+	ld	(loglane),a	;mark lnae where frog needs to move with log
+
+
+;	ld	hl,lanedir	;get direction of this lane
+;	ld	a,(froglane)
+;	add	a,l
+;	ld	l,a
+;	jr	nc,log1
+;	inc	h
+;log1
+;	ld	b,(hl)
+;	ld	a,(frogx)
+;	add	a,b
+;	ld	(frogx),a
+nocoll
+
+	ret
+
+

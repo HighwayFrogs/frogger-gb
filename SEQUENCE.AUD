@@ -1,0 +1,43 @@
+;****************************************
+;*        music sequence data	 		*
+;****************************************
+;
+seqstart
+;
+;
+;--------------------------------------
+;
+	ifdef	bart
+	ifdef	devapd
+	include	bart\bart.mus
+	else
+	include	bart.mus
+	endif
+	endif
+;
+;--------------------------------------
+;
+	ifdef	turn
+	ifdef	devapd
+	include	turn\turn.mus
+	else
+	include	turn.mus
+	endif
+	endif
+;
+;--------------------------------------
+;
+	ifdef	home
+	ifdef	devapd
+	include	home\home.mus
+	else
+	include	home.mus
+	endif
+	endif
+;
+;--------------------------------------
+;
+seqend
+seqsize	equ	seqend-seqstart
+;
+

@@ -1,0 +1,109 @@
+addscore			;add bc to score (if b=ff, add 25000)
+	ld	a,b
+	sta	t1
+adscor0	ld	a,c
+	and	$f
+	ld	hl,score+5
+	add	a,(hl)
+	ld	(hl),a		;sta score+5
+	ld	a,c
+	swap	a
+	and	$f
+	dec	hl
+	add	a,(hl)
+	ld	(hl),a		;sta score+4
+	ld	a,b
+	and	$f
+	dec	hl
+	add	a,(hl)
+	ld	(hl),a		;sta score+3
+	ld	a,b
+	swap	a
+	and	$f
+	dec	hl
+	add	a,(hl)
+	ld	(hl),a		;sta score+2
+adscor3
+
+	ld	b,5		;ripple carry
+	ld	hl,score+5
+adscor1	ld	a,(hl)		;lda score,x
+	cp	10
+	bcc	adscor2
+	sub	10
+	ld	(hl),a		;sta score,x
+	dec	hl
+	inc	(hl)		;inc score-1,x
+	inc	hl
+adscor2	dec	hl
+	dec	b
+	bne	adscor1
+	ret
+
+drawscore
+	ld	de,SCORELOC
+	ld	b,0
+	ld	c,b
+	ld	hl,SCORE  
+FILTX2	ld	a,(hli)    
+	and	a         
+	jr	nz,FLTX2A 
+	bit	0,c       
+	jr	z,pblnk
+FLTX2A	add	a,number
+	set	0,c       
+	jr	fltx2b
+pblnk	ld	a,blnkch
+FLTX2B	ld	(de),a   
+	inc	de        
+	inc	b         
+	ld 	a,b       
+	cp 	5  ;5    
+	jr 	c,FILTX2  
+	set	0,c       
+	cp 	5  ;5    
+	jr 	z,FILTX2  
+nscrdsp	call	pspace
+      	ret
+
+PSPACE     ld   a,blnkch
+           ld   (de),a    
+           inc  de        
+           ret            
+
+numset
+
+ DB $7C,$CE,$DE,$D6
+ DB $F6,$E6,$7C,$00
+
+ DB $30,$F0,$30,$30
+ DB $30,$30,$FC,$00
+
+ DB $7C,$C6,$06,$7C
+ DB $C0,$C0,$FE,$00
+
+ DB $7C,$C6,$06,$1C
+ DB $06,$C6,$7C,$00
+
+ DB $C6,$C6,$C6,$FE
+ DB $06,$06,$06,$00
+
+ DB $FE,$C0,$C0,$FC
+ DB $06,$C6,$7C,$00
+
+ DB $7C,$C6,$C0,$FC
+ DB $C6,$C6,$7C,$00
+
+ DB $FE,$06,$0E,$1C
+ DB $38,$30,$30,$00
+
+ DB $7C,$C6,$C6,$7C
+ DB $C6,$C6,$7C,$00
+
+ DB $7C,$C6,$C6,$7E
+ DB $06,$C6,$7C,$00
+
+
+
+
+

@@ -1,0 +1,188 @@
+; DECMPRS.DMG   Copyright 1990, Imagineering Inc.  ***Confidential***
+
+
+
+; DECMPSET: This routine de-compresses from (HL) into (DE) a character
+;		set as compressed by NIN2RUNL.EXE.  Details on this
+;		compression follow the routines.
+;
+;Entry:
+;	hl - Source addr
+;	de - Destination addr
+;Return:
+;	hl - One address past terminator
+;Used: a,bc,de,hl
+;Needs temp cell 'decmptmp'
+
+decmpset
+	ld	a,1
+	ld	(decmptmp),a
+dcmps0	push	de		;save destination for second pass
+	ld	a,(hli)		;get flag byte
+	ld	c,a
+dcmps1	ld	b,1		;(dummy count for single byte output)
+	ld	a,(hli)		;top of loop
+	cp	c		;flag byte?
+	jr	nz,dcmps3	;no, go output this byte only
+	ld	a,(hli)		;yes, get second byte
+	and	a		;terminator?
+	jr	z,dcmps9	;yes, end even byte decompression
+	ld	b,a		;(save as count)
+	bit	6,b		;test 'ditto' flag (only used in pass 2)
+	jr	z,dcmps1b	;no
+	dec	de		;yes, output (de-1) to (de)
+	res	6,b		;clear ditto flag
+	inc	b
+dcmps1a	ld	a,(de)
+	inc	de
+	ld	(de),a
+	inc	de
+	dec	b
+	jr	nz,dcmps1a	;loop b times
+	inc	de
+	jr	dcmps1
+dcmps1b	xor	a
+	bit	7,b		;list of zeros?
+	jr	nz,dcmps2	;yes, go write a register (currently zero)
+	ld	a,(hli)		;else get 'data byte' for run of b bytes
+dcmps2	res	7,b		;clear MSB of count
+dcmps2a	inc	b		;inc to loop b rather than b-1 bytes
+dcmps3	ld	(de),a
+	inc	de
+	inc	de
+	dec	b
+	jr	nz,dcmps3	;loop b times
+	jr	dcmps1		;to top of loop
+
+dcmps9
+	ld	a,d
+	ld	(kludge),a
+	ld	a,e
+	ld	(kludge+1),a
+	pop	de		;restore de for pass 2, odd bytes
+	inc	de		;point to first odd byte destination
+	ld	a,(decmptmp)
+	dec	a		;second loop time?
+	ld	(decmptmp),a
+	jr	z,dcmps0	;yes, loop to top
+
+	ld	a,(kludge)
+	ld	d,a
+	ld	a,(kludge+1)
+	ld	e,a
+	dec	de
+
+	ret
+
+
+
+
+
+
+
+; DECMPMAP: This routine de-compresses from (HL) into (DE) a character
+;		map as compressed by NIN2RUNL.EXE.  Details on this
+;		compression follow the routines.
+;
+;Entry:
+;	hl - Source addr
+;	de - Destination addr
+;Return:
+;	hl - One address past terminator
+;Used: a,bc,de,hl
+;Needs temp cells 'decmptmp' and 'decmpcom'
+
+decmpmap
+	xor	a		;init mod20 count
+	ld	(decmptmp),a
+	ld	a,(hli)		;get flag byte
+	ld	c,a
+	ld	a,(hli)		;get most common
+	ld	(decmpcom),a
+dcmpm1	ld	b,1		;(dummy count for single byte output)
+	ld	a,(hli)		;top of loop
+	cp	c		;flag byte?
+	jr	nz,dcmpm3	;no, go output this byte only
+	ld	a,(hli)		;yes, get second byte
+	and	a		;terminator?
+	jr	z,dcmpm9	;yes, end map decompression
+	ld	b,a		;(save as count)
+	ld	a,(decmpcom)	;pre-load most common byte
+	bit	7,b		;list of zeros?
+	jr	nz,dcmpm2	;yes, go write 'a' register (most common)
+	ld	a,(hli)		;else get 'data byte' or 'run start byte'
+dcmpm2	res	7,b		;clear flag from count
+	bit	6,b		;test 'incrementing run' flag
+	jr	z,dcmpm2a	;no, go write
+	res	6,b		;remove flag from count
+	inc	b		;inc to loop b rather than b-1 bytes
+dcmpinc	call	out20		;output it
+	inc	a		;and inc it
+	dec	b
+	jr	nz,dcmpinc	;loop b times
+	jr	dcmpm1		;to top of loop
+dcmpm2a	inc	b		;inc to loop b rather than b-1 bytes
+dcmpm3	call	out20
+	dec	b
+	jr	nz,dcmpm3	;loop b times
+	jr	dcmpm1		;to top of loop
+
+dcmpm9	ret
+
+
+out20	ld	(de),a		;output (de) and add 12 to de every 20 bytes
+	inc	de
+	push	af
+	ld	a,(decmptmp)
+	inc	a
+	cp	20
+	jr	c,out20b
+	ld	a,12
+	add	a,e
+	ld	e,a
+	jr	nc,out20a
+	inc	d
+out20a	xor	a
+out20b	ld	(decmptmp),a
+	pop	af
+	ret
+
+
+
+
+
+
+
+; Detail of NIN2RUNL compression:
+
+;This program takes a multi-screen .NIN file and outputs 1 character
+;set in Game Boy format and multiple character maps, all compressed.
+;The character set is broken into even and odd bytes (bitplanes)
+;and is compressed as follows:
+;Even bytes -
+;First byte is the run-length flag byte (an unused byte).
+;Subsequent data is recorded as one of 4 compression sets:
+;1. flag,count(2-$3F),data byte        Outputs count+1 'data bytes'
+;2. flag,count+$80                     Outputs count+1 zeros
+;3. data byte                          Outputs single data byte
+;4. flag,0                             Terminator, do odd bytes
+;Odd bytes -
+;First byte is the run-length flag byte (an unused byte).
+;Subsequent data is recorded as one of 5 compression sets:
+;1. flag,count(2-$3F),data byte        Outputs count+1 'data bytes'
+;2. flag,count+$80                     Outputs count+1 zeros
+;3. flag,count+$40                     Count+1 odd bytes same as even bytes
+;4. data byte                          Outputs single data byte
+;5. flag,0                             Terminator, end of character set
+;
+;The screen map compression is as follows:
+;First two bytes are run-length flag and 'most common character' (usually zero).
+;Subsequent data is recorded as one of 5 compression sets:
+;1. flag,count(2-$3F),data byte        Outputs count+1 'data bytes'
+;2. flag,count+$80                     Outputs count+1 'most common'
+;3. flag,count+$40,run start byte      Count+1 bytes of incrementing run
+;4. data byte                          Outputs single data byte
+;5. flag,0                             Terminator, end of map
+
+
+

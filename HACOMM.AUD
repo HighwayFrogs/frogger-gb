@@ -1,0 +1,35 @@
+;
+; WARNING!!! songnumbers after eleminiated songs decrease
+;
+song1	equ	1	;theme
+;
+soundup	equ	$80
+sounddn	equ	soundup+1
+soundlf	equ	sounddn+1
+soundrg	equ	soundlf+1
+;snd_tab
+;
+;**********************************
+;* sequence data tables	*
+;**********************************
+;
+;
+tempos	equ	$-1		;song tempos
+;
+	if	song1
+	db	tempo1
+	endif
+;
+sngtab	equ	$-8		;pointers to driver sequences
+;
+	if	song1
+	dw	0+s1d1sl
+	dw	0+s1d2sl
+	dw	0+s1d3sl
+	dw	0+s1d4sl
+	endif
+;
+sngpan  equ     $-1
+	db      %11111111       ;theme
+;
+

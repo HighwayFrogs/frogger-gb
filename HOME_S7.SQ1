@@ -1,0 +1,79 @@
+;HOME_S7.SQ1
+
+;**************
+;*   Song 7   *
+;**************
+
+
+;******************
+;*   Sequence 1   *
+;******************
+
+
+;instrument list
+
+s7d1ch08	equ	home7ins-instyp
+s7d2ch06	equ	s7d1ch08+1
+s7d3ch07	equ	s7d2ch06+1
+
+tempo7		equ	135
+
+;Driver #1
+
+ml711 
+	dw	m01711
+	dw	mend
+
+m01711
+	db	prgcng,s7d1ch08,normal
+	db	 06,cn5+00,010	;ch08
+	db	 06,en5+00,010	;ch08
+	db	 12,cn5+00,010	;ch08
+	db	 06,gn5+00,010	;ch08
+	db	 18,cn5+00,010	;ch08
+	db	mend
+;Driver #2
+
+ml712 
+	dw	m01712
+	dw	mend
+
+m01712
+	db	prgcng,s7d2ch06,normal
+	db	 06,cn5+00,010	;ch08
+	db	 06,en5+00,010	;ch08
+	db	 12,cn5+00,010	;ch08
+	db	 06,gn5+00,010	;ch08
+	db	 18,cn5+00,010	;ch08
+	db	mend
+
+;Driver #3
+
+ml713 
+	dw	m01713
+	dw	mend
+
+m01713
+	db	prgcng,s7d3ch07,normal
+	db	 06,cn5+00,010	;ch08
+	db	 06,en5+00,010	;ch08
+	db	 12,cn5+00,010	;ch08
+	db	 06,gn5+00,010	;ch08
+	db	 18,cn5+00,010	;ch08
+	db	mend
+
+;Driver #4
+
+ml714 
+	dw	m01714
+	dw	mend
+
+m01714
+	db	 006,snare1,005	;ch08
+	db	 006,snare1,005	;ch08
+	db	 012,snare1,005	;ch08
+	db	 006,snare1,005	;ch08
+	db	 018,snare1,005	;ch08
+	db	mend
+
+

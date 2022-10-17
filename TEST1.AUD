@@ -1,0 +1,137 @@
+;------------------------------------
+; sound effect data/dynamics
+;------------------------------------
+;
+snd_init_tab	
+	dw	play_one_shot	; 0
+	dw	play_one_shot	; 1
+	dw	play_one_shot	; 2
+	dw	play_one_shot	; 3
+	dw	play_one_shot	; 4
+	dw	play_one_shot	; 5
+	dw	play_one_shot	; 6
+	dw	play_one_shot	; 7
+	dw	play_one_shot	; 8
+	dw	play_one_shot	; 9
+	dw	play_one_shot	; a
+	dw	play_one_shot	; b
+	dw	play_one_shot	; c
+	dw	play_one_shot	; d
+	dw	play_one_shot	; e
+
+
+snd_tab	
+	dw	keyct	;short key click sound
+	dw	beept	;beep
+	dw	buzzt	;invalid move
+	dw	undot	;undo
+	dw	paust	;pause
+	dw	cjmpt	;cursor jump from rack to board
+	dw	hight	;highlight tile in rack
+	dw	fillt	;fill rack
+	dw	warnt	;time running out
+	dw	timet	;time is up
+	dw	dropt	;drop tile on board
+	dw	donet	;word done / select pressed
+	dw	pickt	;pick tile from rack
+	dw	dumpt	;dump tile back to tray
+
+one_shot_tab
+
+;
+;------------------------------------
+; sound effect trigger info 
+;------------------------------------
+;		----- ---- ----     ---- ---- -------
+;		NR51  NR10 NR11     NR12 NR13 NR14
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+keyct	;short key click sound
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c1en, $00, $80+$01, $c7, $00, $c7+ch1
+;
+beept	;beep
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c1en, $00, $80+$03, $c7, $80, $c7+ch1
+;
+
+buzzt	;invalid move
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c4en, $00, $00+$07, $80, $0f, $80+ch4
+;
+undot	;undo
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c1en, $4f, $80+$07, $80, $20, $c6+ch1
+;
+paust	;pause
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c1en, $24, $80+$04, $80, $20, $c6+ch1
+;
+cjmpt	;cursor jump from rack to board
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c1en, $00, $80+$03, $c7, $40, $c7+ch1
+;
+hight	;highlight tile in rack
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c1en, $3c, $c0+$04, $F0, $80, $87+ch1
+;
+fillt	;fill rack
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c4en, $00, $00+$01, $f4, $50, $c1+ch4
+;								
+warnt	;time running out
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c2en, $00, $c0+$10, $f1, $80, $c7+ch2
+;
+timet	;time is up
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c1en, $4f, $80+$07, $80, $c0, $c6+ch1
+;
+dropt	;drop tile on board
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c4en, $00, $00+$01, $f1, $60, $c1+ch4
+;
+donet	;word done / select pressed
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c1en, $44, $80+$10, $80, $00, $c6+ch1
+;
+;
+pickt	;pick tile from rack
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c1en, $4c, $80+$0c, $80, $c0, $c6+ch1
+;
+dumpt	;dump tile back to tray
+;		----- ---- ----     ---- ---- -------
+;		enabl swp  wvln     env  fql  stlnfqh
+;		----- ---- ----     ---- ---- -------
+	db	c4en, $00, $00+$02, $f4, $80, $80+ch4
+;
+;
+

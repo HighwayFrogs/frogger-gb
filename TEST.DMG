@@ -1,0 +1,27 @@
+l0
+	ld	a,(froglane)
+	cp	6
+	jr	nc,l9	;not in car lanes
+	ld	a,(jumpcount)
+	and	a
+	jr	z,l9
+	ld	a,(frogframe)
+	cp	5		;facing right
+	jr	c,l9		;no, forward
+	cp	8
+	jr	nc,l2		;check left
+;  	ld	a,(xmod8)	;facing right
+;	cp	4	;6		;
+;	jr	c,l9		;not that far to the right
+	xor	a
+	ld	(colchar2),a
+	jr	l9
+l2
+	cp	$d		;left?
+	jr	c,l9
+;	ld	a,(xmod8)
+;	cp	4	;2
+;	jr	nc,l9
+	xor	a
+	ld	(colchar0),a
+l9

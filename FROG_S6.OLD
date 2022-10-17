@@ -1,0 +1,170 @@
+;HOME_S6.SQ1
+
+;**************
+;*   Song 6   *
+;**************
+
+
+;******************
+;*   Sequence 1   *
+;******************
+
+
+;instrument list
+
+s6d1ch10	equ	home6ins-instyp
+s6d2ch06	equ	s6d1ch10+1
+s6d3ch01	equ	s6d2ch06+1
+
+tempo6		equ	49+8
+
+;Driver #1
+
+ml611 
+	dw	m02611
+	dw	mend
+
+m02611
+	db	prgcng,s6d1ch10,normal
+	db	3,As4,3
+	db	3,Fs4,3
+	db	3,Fs4,3
+	db	3,Fs4,3
+	db	3,As4,3
+	db	3,Fs4,3
+	db	3,Fs4,3
+	db	3,Fs4,3
+	db	3,Bn4,3
+	db	3,Bn4,3
+	db	3,As4,3
+	db	3,As4,3
+	db	6,Gs4,6
+	db	3,Bn4,3
+	db	3,Bn4,3
+	db	3,As4,3
+	db	3,As4,3
+	db	3,Gs4,3
+	db	3,Gs4,3
+	db	3,Ds5,3
+	db	3,Ds5,3
+	db	3,Cs5,3
+	db	3,Bn4,3
+	db	3,As4,3
+	db	3,Gs4,3
+	db	12,Fs4,8	;was 6,..,4
+	db	mend
+;Driver #2
+
+ml612 
+	dw	m01612
+	dw	mend
+
+m01612
+	db	prgcng,s6d2ch06,normal
+	db	3,As4,2
+	db	3,Fs4,2
+	db	3,Fs4,2
+	db	3,Fs4,2
+	db	3,As4,2
+	db	3,Fs4,2
+	db	3,Fs4,2
+	db	3,Fs4,2
+	db	3,Bn4,2
+	db	3,Bn4,2
+	db	3,As4,2
+	db	3,As4,2
+	db	6,Gs4,4
+	db	3,Bn4,2
+	db	3,Bn4,2
+	db	3,As4,2
+	db	3,As4,2
+	db	3,Gs4,2
+	db	3,Gs4,2
+	db	3,Ds5,2
+	db	3,Ds5,2
+	db	3,Cs5,2
+	db	3,Bn4,2
+	db	3,As4,2
+	db	3,Gs4,2
+	db	12,Fs4,8
+	db	mend
+
+;Driver #3
+
+ml613 
+	dw	m02613
+	dw	mend
+
+m02613
+	db	prgcng,s6d3ch01,normal
+	db	3,Fs3,2
+	db	3,.rst,3 
+	db	3,Cs3,2
+	db	3,.rst,3 
+	db	3,Fs3,2
+	db	3,.rst,3 
+	db	3,Cs3,2
+	db	3,.rst,3 
+	db	3,Bn3,2
+	db	3,.rst,3 
+	db	3,Ds3,2
+	db	3,.rst,3 
+	db	3,Ds3,2
+	db	3,Bn3,2
+	db	3,Ds3,2
+	db	3,Bn3,2
+	db	3,Bn3,2
+	db	3,.rst,3
+	db	3,Ds3,2
+	db	3,.rst,3
+	db	3,Bn3,2
+	db	3,.rst,3
+	db	3,Ds3,2
+	db	3,.rst,3
+	db	3,Fs3,3
+	db	3,Cs4,2
+	db	3,Fs3,2
+;	db	3,Cs4,2
+;	db	6,Fs3,2
+	db	mend
+
+;Driver #4
+
+ml614 
+	dw	m01614
+	dw	mend
+
+m01614
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	6,snare1,4
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	3,snare1,2
+	db	6,snare1,4
+	db	mend
+
+;MIDI events found   = 57
+;records generated   = 34
+;percent compression = 40
+;total bytes output  = 136
+

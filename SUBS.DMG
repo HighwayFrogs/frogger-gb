@@ -1,0 +1,481 @@
+;Read key state and determine key OFF->ON transitions
+;Author: Nintendo, Comments by Mark Klein
+;Entry:
+;	(cnt1) - old key values
+;Return:
+;	(cnt1) - key state
+;       (trg1) - Off to On transition flags
+;Used:	a,b,c
+;Bit to key mapping:
+;********************
+;*    6             *
+;*  5   4  2 3  1 0 *
+;*    7             *
+;********************
+
+read_keys
+	ld	a,$20 		;Lower P14
+	ld	(p1),a
+	ld	a,(p1)		;Nintendo's delay
+	ld	a,(p1)		;Read P13..P10 (Pulled low if switch closed)
+	ld	a,(p1)		;Delay (total ld a,(p1)'s):
+	ld	a,(p1)		;Alleyway = 10, BaseBall = 7?
+	ld	a,(p1)		;Tetris = 4, Tennis = 2, Sample = 2
+	ld	a,(p1)
+	ld	a,(p1)
+	cpl
+	and	$0f
+	swap	a		;Place inverted P13..P10 into high nibble
+	ld	b,a		;Down, Up, Left, Right
+	ld	a,$10		;Lower P15
+	ld	(p1),a
+	ld	a,(p1)		;Nintendo's delay
+	ld	a,(p1)		;Alleyway = 10, BaseBall = 7?
+	ld	a,(p1)		;Tetris = 10, Tennis = 6, Sample = 6
+	ld	a,(p1)
+	ld	a,(p1)
+	ld	a,(p1)
+	ld	a,(p1)
+	ld	a,(p1)
+	ld	a,(p1)
+	ld	a,(p1)		;Read P13..P10
+	cpl
+	and	$0f		;Start, Select, B, A
+	or	b		;D, U, L, R, Strt, Sel, B, A
+	ld	c,a
+	ld	a,(cnt1)
+	xor	c		;Identify change
+	and	c		;Limit to ON transition
+	ld	(trg1),a	;Store results
+	ld	a,c
+	ld	(cnt1),a
+	ld	a,$30		;Return P15 and P14 to high state
+	ld	(p1),a
+	ret
+
+
+
+	if 0
+intrface
+	ld	a,(pageflip)	;process background flip
+	swap	a
+	srl	a
+	and	%00001000
+	ld	b,a
+	ld	a,(LCDC)
+	and	%11110111
+	or	b
+	ld	(LCDC),a
+	endif
+invblank
+	ld	a,(LCDC)
+	bit	7,a		;LCD on?
+	jr	z,invbl		;no, act as if in vblank
+	ld	a,(LY)		;within vblank?
+	cp	144
+	jr	nc,ninvbl		;no
+	cp	152
+	jr	c,ninvbl		;no
+invbl	xor	a
+	ret
+ninvbl	or	1
+	ret
+
+; ***********************************
+; ***  resident area subroutines  ***
+; ***********************************
+
+
+
+Init_MBC
+				;***Later $00, no RAM
+	if	emulate
+	ld	a,$0A		;Allow Extended RAM access (There is none)
+	else
+	xor	a
+	endif
+	ld	(MBC_REG0),a
+	ld	(MBCshad0),a	;Shadow write for emulator
+	ld	a,1		;Bank 1 (1..3 allowed)
+	ld	(MBC_REG1),a
+	ld	(MBCshad1),a	;Shadow write for emulator
+	xor	a
+	ld	(MBC_REG2),a	;RAM bank 0 (No extended RAM present)
+	ld	(MBC_REG3),a	;ROM, non-RAM upper bits
+	ld	(MBCshad2),a	;Shadow write for emulator
+	ld	(MBCshad3),a	;Shadow write for emulator
+	ret
+
+
+;Set MBC to selected bank
+;Enter:	Set_bank
+;	a - Bank number for upper 16k space (1,2,3)
+;Enter:	Set_bank_N
+;	none
+;Preserved: all
+Set_bank_4			;Map data
+	push	af
+	ld	a,4
+	jr	sbhop
+
+Set_bank_3			;Map data
+	push	af
+	ld	a,3
+	jr	sbhop
+Set_bank_2			;Character sets, screens
+	push	af
+	ld	a,2
+	jr	sbhop
+Set_bank_1			;Normal setting
+	push	af
+	ld	a,1
+	jr	sbhop
+Set_bank
+	push	af
+sbhop
+	ld	(MBC_REG1),a
+	ld	(MBCshad1),a	;Shadow write
+	pop	af
+	ret
+
+
+dopause
+	ld	a,(stick)
+	and	8
+	ld	hl,strtdeb
+	cp	(hl)
+	ld	(strtdeb),a
+	jr	z,nopause
+	and	a
+	jr	z,nopause
+	ld	a,(pause)
+	xor	1
+	ld	(pause),a
+	jr	nz,ispause
+	call	clrpause
+	jr	nopause
+ispause
+	call	prpause
+	ld	hl,NR51		;stop sound hardware
+	ld	a,(hl)
+	ld	(soundsav),a
+	xor	a
+	ld	(hl),a
+	if audio
+	ld	a,(cnt1)
+	cp	$0f
+	jr	z,noclick
+	ld	a,stick_s
+	call	gsetsnd
+noclick
+	endif
+
+nopause	ld	a,(pause) 
+	and	a         
+	jr	z,nquiet  
+
+
+nquiet	ld	a,(pause)
+	ld	b,a
+nquiet1	ld	a,(gameover)
+	or	b
+	ret
+
+
+
+
+
+PRPAUSE
+
+	ld	hl,pausetxt
+	ld	de,pauseloc
+	ld	b,7
+l0
+	ld	a,(hli)
+	ld	(de),a
+	inc	de
+	dec	b
+	jr	nz,l0
+	ret
+
+clrpause
+	ld	hl,clrptxt
+	ld	de,pauseloc
+	ld	b,7
+l0
+	ld	a,(hli)
+	ld	(de),a
+	inc	de
+	dec	b
+	jr	nz,l0
+	ret
+
+pausetxt	db	0
+		db	$44,$45,$43,$46,$47
+		db	0
+clrptxt	db	0,0,0,0,0,0,0
+;brick,brick,brick,brick,brick,brick,brick
+
+
+
+
+dornd	ld	b,0		;cycle random once
+dorndb	inc	b		;cycle random b times
+dorndb1	ld	hl,random
+	ld	a,(hl)
+	sla	a
+	xor	(hl)
+	sla	a
+	rl	(hl)
+	dec	b
+	jr	nz,dorndb1
+	ld	a,(hl)
+	ret
+
+;Transfer dma_to_OAM routine to internal work ram
+;Used: a,b,c,hl
+
+dmaset	ld      c,low dma_to_OAM	;Destination low byte, high byte = $FF
+	ld      b,dma_end-dmadata	;Size of routine
+	ld      hl,dmadata		;Start of routine
+L0      ld      a,(hli)
+	ld      (c),a			;FF page store
+	inc     c
+	dec     b
+	jr      nz,L0
+	ret
+
+
+
+dmadata
+	loc	dma_to_OAM	;Ultimate destination of this routine
+	ld	a,high OAMshad	;Set start source addr and initiate copy
+	ld	(dma),a
+	ld	a,40            ;Loop 40 times, 160 cycle wait
+ddlp	dec	a
+	jr	nz,ddlp
+	ret
+	endloc			;Reset the above loc statement
+dma_end
+
+;Fill/Zero Ram block (Optimized for speed)
+;Author: Mark Klein
+zero_ram_c			;Zero up to $FF bytes
+	ld	b,0
+zero_ram_bc			;Zero up to $FFFF bytes
+	xor	a
+fill_ram
+	inc	b		;This is done so zero is checked after decrement
+	inc	c		;00..FF -> 01..00 remapping
+fr_lp	dec	c
+	jr	z,low_carry	;==0, if original number would go negative
+lc_rtn	ld	(hli),a
+	jr	fr_lp
+low_carry
+	dec	b		;==0, if original number would go negative
+	jr	nz,lc_rtn
+	ret
+
+
+;**************************
+;*** Interrupt handling ***
+;**************************
+
+
+
+;When an interrupt is being serviced, all other interrupts are held off
+;until reti or ei
+
+;Handle Vertical Blank Interrupt
+
+vblank
+	push    af
+	ld	a,(LY)		;If (LY) != 144, this vertical blank has been
+	cp	144		;held off by the emulator. Don't do any
+	jr	z,good_vb	;processing, and don't set (vbflag)
+	xor     a		;Clear vblank flag
+	ld      (vbflag),a
+	pop	af
+	reti			;Re-enables interrupts
+good_vb	push    bc
+	push    de
+	push    hl
+
+		       		;init scrolls for next frame
+	xor	a		;top lane scroll value
+	ld	(scx),a
+	ld	(lanecount),a
+	ld	a,firstly		;test value, first irq
+	ld	(LYC),a
+
+
+	call    dma_to_OAM	;DMA transfer object buffer to OAM
+				;This routine is in internal RAM
+	ld      a,1		;Flag set for v-blank end
+	ld      (vbflag),a
+
+vbout
+	pop     hl
+	pop     de
+	pop     bc
+	pop     af
+	reti			;Re-enables interrupts
+
+
+
+
+
+
+;LCDC interrupt
+;Set for LYC=LY coincidence
+
+lcdcirq
+	push	af
+	push	hl
+	push	bc
+
+; index scroll value (from ram) and next LYC value (from table
+
+	ld	hl,lanecount
+	ld	a,(hl)
+	inc	(hl)
+	ld	b,(hl)
+	ld	hl,xlane
+	add	a,l
+	ld	l,a
+	ld	a,(hl)
+	ld	hl,STAT
+	
+L0	bit	1,(hl)
+	jr	nz,L0	 
+	ld	(scx),a
+	ld	hl,lytab
+	ld	a,b
+	add	a,l
+	jr	nc,l9
+	inc	h
+l9
+	ld	l,a
+	ld	a,(hl)
+	ld	(LYC),a
+
+	pop	bc
+	pop	hl
+	pop	af
+	
+	reti
+
+
+
+	ld	a,(LY)
+	cp	$30
+	jr	nz,irq2
+
+L0	ld	a,(STAT)
+	and	3
+	jr	nz,L0	 
+
+	ld	a,(xlane+1)
+	ld	(scx),a
+	ld	a,$60
+	ld	(LYC),a
+	pop	hl
+	pop	af
+	reti
+irq2
+
+L0	ld	a,(STAT)
+	and	3
+	jr	nz,L0	 
+
+	ld	a,(xlane+2)
+	ld	(scx),a
+irqout
+	pop	hl
+	pop	af
+	reti
+
+
+
+gmusic	ld	a,(pause)
+	and	a
+	jr	nz,quiet
+	ld	a,(MBCshad1)	;save current bank on stack
+	push	af
+	call	set_bank_2	;bank in nxtscr tables
+	otherbank 2
+	call	music
+	pop	af		;restore bank for calling routine
+	call	Set_bank
+	otherbank 1
+quiet	ret
+
+gsound	ld	a,(MBCshad1)	;save current bank on stack
+	push	af
+	call	set_bank_2	;bank in nxtscr tables
+	otherbank 2
+	call	sound
+	pop	af		;restore bank for calling routine
+	call	Set_bank
+	otherbank 1
+	ret
+
+gsetseq	push	bc
+	push	de
+	push	hl
+	ld	b,a
+	ld	a,(MBCshad1)	;save current bank on stack
+	push	af
+	call	set_bank_2	;bank in nxtscr tables
+	otherbank 2
+	ld	a,b
+	call	setseq
+bnk2com	pop	af		;restore bank for calling routine
+	call	Set_bank
+	otherbank 1
+	pop	hl
+	pop	de
+	pop	bc
+	ret
+
+
+gsetsnd	ld	(sndsavea),a
+	push	bc
+	push	de
+	push	hl
+	ld	a,(MBCshad1)	;save current bank on stack
+	push	af
+	call	set_bank_2	;bank in nxtscr tables
+	otherbank 2
+	ld	a,(sndsavea)
+	call	setsnd
+	otherbank 1
+	jr	bnk2com
+
+gkillsnd
+	push	bc
+	push	de
+	push	hl
+	ld	a,(MBCshad1)	;save current bank on stack
+	push	af
+	call	set_bank_2	;bank in nxtscr tables
+	otherbank 2
+	call	sndoff
+	otherbank 1
+	jr	bnk2com
+
+gkillid	ld	(sndsavea),a
+	push	bc
+	push	de
+	push	hl
+	ld	a,(MBCshad1)	;save current bank on stack
+	push	af
+	call	set_bank_2	;bank in nxtscr tables
+	otherbank 2
+	ld	a,(sndsavea)
+	call	killid
+	otherbank 1
+	jr	bnk2com
+
+
+

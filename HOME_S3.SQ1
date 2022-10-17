@@ -1,0 +1,86 @@
+;HOME_S3.SQ1
+
+;**************
+;*   Song 3   *
+;**************
+
+
+;******************
+;*   Sequence 1   *
+;******************
+
+
+;instrument list
+
+s3d1ch10	equ	home3ins-instyp
+s3d2ch06	equ	s3d1ch10+1
+s3d3ch01	equ	s3d2ch06+1
+
+tempo3		equ	240
+
+;Driver #1
+
+ml311 
+	dw	m01311
+	dw	mend
+
+m01311
+	db	prgcng,s3d1ch10,normal
+	db	 006,cn4+00,005	;ch10
+	db	 006,dn4+00,005	;ch10
+	db	 006,en4+00,005	;ch10
+	db	 006,fn4+00,005	;ch10
+	db	 006,gn4+00,005	;ch10
+	db	mend
+
+;Driver #2
+
+ml312 
+	dw	m01312
+	dw	mend
+
+m01312
+	db	prgcng,s3d2ch06,normal
+	db	 006,cn4+00,005	;ch10
+	db	 006,dn4+00,005	;ch10
+	db	 006,en4+00,005	;ch10
+	db	 006,fn4+00,005	;ch10
+	db	 006,gn4+00,005	;ch10
+	db	mend
+
+	db	mend
+
+;Driver #3
+
+ml313 
+	dw	m01313
+	dw	mend
+
+m01313
+	db	prgcng,s3d3ch01,normal
+	db	 006,cn4+00,005	;ch10
+	db	 006,dn4+00,005	;ch10
+	db	 006,en4+00,005	;ch10
+	db	 006,fn4+00,005	;ch10
+	db	 006,gn4+00,005	;ch10
+	db	mend
+
+;Driver #4
+
+ml314 
+	dw	m01314
+	dw	mend
+
+m01314
+	db	 006,bassd1,003	;ch16'
+	db	 006,bassd1,003	;ch16
+	db	 006,bassd1,003	;ch16
+	db	 006,bassd1,003	;ch16
+	db	 006,bassd1,003	;ch16
+	db	mend
+
+;MIDI events found   = 605
+;records generated   = 68
+;percent compression = 88
+;total bytes output  = 265
+

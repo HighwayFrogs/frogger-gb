@@ -1,0 +1,78 @@
+
+; gethl: add register to hl
+; gethla: gethl then get byte from resulting location
+;
+;	registers affected:	a,h,l
+
+gethl	macro	reg const
+	ld	a,reg
+	ld	hl,const
+	add	a,l
+	ld	l,a
+	jr	nc,l1
+	inc	h
+l1
+	endm
+
+gethla	macro	reg const
+	ld	a,reg
+	ld	hl,const
+	add	a,l
+	ld	l,a
+	jr	nc,l2
+	inc	h
+l2	ld	a,(hl)
+	endm
+
+
+
+; lhl and lde: double byte loads from RAM
+;
+;	registers affected:	a,h,l (d,e)
+
+lhl	macro	const
+	ld	a,(const)
+	ld	l,a
+	ld	a,(const+1)
+	ld	h,a
+	endm
+lde	macro	const
+	ld	a,(const)
+	ld	e,a
+	ld	a,(const+1)
+	ld	d,a
+	endm
+
+
+; sthl and stde: double byte stores to RAM
+;
+;	registers affected:	a,h,l (d,e)
+
+sthl	macro	const
+	ld	a,l
+	ld	(const),a
+	ld	a,h
+	ld	(const+1),a
+	endm
+stde	macro	const
+	ld	a,e
+	ld	(const),a
+	ld	a,d
+	ld	(const+1),a
+	endm
+
+
+
+;incnc: inc register if no carry (saves symbols)
+;
+incnc	macro	reg
+	jr	nc,l3
+	inc	reg
+l3
+	endm
+
+
+
+
+
+

@@ -1,0 +1,92 @@
+;Win Game
+	db	Track 1
+	db	6,Fs4,4
+	db	6,Gs4,4
+	db	6,As4,4
+	db	6,Bn,4,4
+	db	12,Cs5,10
+	db	12,As4,10
+	db	6,Fs4,4
+	db	6,Gs4,4
+	db	6,As4,4
+	db	6,Gs4,4
+	db	12,Fs4,10
+	db	12,Fs4,10
+	db	6,Fs4,4
+	db	6,Gs4,4
+	db	6,As4,4
+	db	6,Bn,4,4
+	db	12,Cs5,10
+	db	12,As4,10
+	db	6,Cs5,4
+	db	6,Bn,4,4
+	db	6,As4,4
+	db	6,Gs4,4
+	db	12,Fs4,10
+;Track2
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Gs2,4
+	db	6,Ds3,4
+	db	6,Gs2,4
+	db	6,Ds3,4
+	db	12,Fs2,10
+
+;Game Over
+;Track 1
+	db	6,Fn,3,4
+	db	6,Gs3,4
+	db	6,Cs3,4
+	db	6,Gs3,4
+	db	6,Fn,3,4
+	db	6,Gs3,4
+	db	6,Cs3,4
+	db	6,Gs3,4
+	db	6,Fs3,4
+	db	6,Gs3,4
+	db	6,Ds3,4
+	db	6,Gs3,4
+	db	6,Fn,3,4
+	db	6,Gs3,4
+	db	6,Cs3,4
+;Track 2
+	db	6,Gs4,4
+	db	3,Fn,4
+	db	6,Cs3,4
+	db	6,Cs3,4
+	db	6,Fn,5,4
+	db	3,Ds5,2
+	db	3,Cs5,2
+	db	3,Bn,4
+	db	3,As4,2
+	db	6,Gs4,4
+	db	6,Fs4,4
+	db	6,Gs4,4
+	db	6,Ds4,4
+	db	6,Gs4,4
+	db	6,Fn,4,4
+	db	6,Gs4,4
+	db	6,Cs4,4
+

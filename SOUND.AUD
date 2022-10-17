@@ -1,0 +1,563 @@
+;****************************************
+;* 								*
+;*	      	SOUND.SND				*
+;*		 						*
+;*								*
+;*   Sound Effect Drivers for GameBoy   *
+;*								*
+;*								*
+;* Copyright (c) 1991 Imagineering, Inc.*
+;*								*
+;****************************************
+;
+;
+;    Prepared for Imagineering, Inc. by
+;
+;	Stuart E. Ross
+;	New Potato Technologies
+;	P.O. Box 187
+;	Danbury, CT  06813
+;
+;	TEL:  (203) 746-9040
+;	FAX:  (203) 746-6929
+;
+
+soundstart					; size
+
+;------------------------------------
+;	Sound Equates
+;------------------------------------
+
+MAX_SOUNDS	equ	$04			; size of sound manager queue
+
+;------------------------------------
+;
+;    SETSND
+;
+;    Add a new sound to the queue
+;
+;	reg a contains sound ID to initialize
+;
+;	numsnds,sndtype,sndpnt are modified
+;
+;	af,bc,de destroyed
+;
+;------------------------------------
+
+setsnd
+
+	push	af				; save ID
+
+	ld	b,0				; setup
+	ld	d,0
+
+	ld	hl,numsnds		; advance sound count
+	inc	(hl)
+	ld	c,(hl)
+
+	ld	a,MAX_SOUNDS+1	; numsnds = MAX?
+	cp	c
+	jp	nz,gosetsnd
+
+	dec	(hl)			; queue is full, return
+	pop	af
+	ret
+
+gosetsnd
+
+	dec	c				; access tables
+
+        ld	hl,sndtype		; save sound ID to type table
+	add	hl,bc
+	pop	af
+	ld	(hl),a
+
+	ld	hl,snd_init_tab	; fetch init vector
+	ld	e,a
+	sla	e
+	add	hl,de
+	ld	a,(hli)			; low byte
+	ld	(sndtmp+1),a
+	ld	a,(hli)			; high byte
+	ld	(sndtmp),a
+
+	ld	hl,sndpnt		; save init vector
+	add	hl,bc
+	add	hl,bc
+	ld	a,(sndtmp)
+	ld	(hli),a
+	ld	a,(sndtmp+1)
+	ld	(hl),a
+
+	ret
+
+;------------------------------------
+;
+;	Main sound effect handler
+;
+;------------------------------------
+
+sound
+
+	xor	a				; setup
+	ld	b,a
+	ld	d,a
+
+	ld	a,(numsnds)		; fetch number of sounds
+
+	dec	a				; skip if no sounds in queue
+	bit	7,a
+	ret	nz
+
+snd_do
+	ld	(sndindx),a		; set index to last in queue
+
+snd_loop
+	
+	ld	a,(sndindx)		; fetch slot index
+	ld	c,a
+	sla	a				; fix index to address words
+	ld	e,a
+
+	ld      hl,sndpnt	    ; point into sound pointer table
+	add     hl,de
+
+	call	indirect_call
+
+;	all drivers return to here
+
+next_sound
+
+	ld	hl,sndindx		; next driver please
+	dec	(hl)
+	bit	7,(hl)
+	jr	z,snd_loop
+
+	ret
+;
+
+indirect_call
+
+	ld      d,(hl)			; fetch routine vector
+	inc	hl
+	ld      e,(hl)
+
+	push	de				; FUNKY indirect jump to sound routine
+	ld      d,0             ; repair D reg to 0
+	ret
+
+;------------------------------------
+;
+;   KILLID
+;
+;   Remove sound from queue via sound ID
+;
+;	reg a contains sound ID to kill
+;
+;	numsnds modified
+;	af,bc,de destroyed
+;
+;   KILLSND
+;
+;   Remove sound from queue via slot index
+;
+;	reg a contains sound slot # to kill
+;
+;	numsnds modified
+;	af,bc,de destroyed
+;
+;------------------------------------
+
+killid
+	ld	d,a			;drl
+	ld	a,(numsnds)		; adjust index and return if queue is empty
+	dec	a
+	bit	7,a
+
+	ret	nz
+
+findsnd
+
+	ld	c,a				; save last index
+	ld	a,d			    	;drl
+;	search for sound ID in queue
+	
+findsnd0
+
+	ld	hl,sndtype		; point to ID for slot c
+	add	hl,bc
+	cp	(hl)			; match stop ID in reg a?
+	jr	z,killsnd0
+
+	dec	c				; next slot
+	bit	7,c
+	jr	z,findsnd0
+
+	ret					; ID not found...
+
+;	Kill sound with slot # in reg c
+
+killsnd
+
+	ld	a,(numsnds)		; fetch last index and return if queue is empty
+	dec	a
+	bit	7,a
+	jr	z,killsnd0
+
+	ret
+
+killsnd0
+
+	ld	(synct0),a		; save last index
+
+;	Kill target sound
+
+killsnd1
+
+	call	sound_off		; kill this one
+;	
+
+killsnd2
+
+	ld	a,(synct0)		; last in queue?
+	cp	c
+	jr	nz,killsnd3
+
+	ld	(numsnds),a		; adjust numsnds
+
+	ret 
+
+;	bump routine vectors
+
+killsnd3
+
+	ld	hl,sndpnt		; pointer to current vector
+	add	hl,bc
+	add	hl,bc	
+	push	hl
+
+	inc	hl				; advance pointer to next vector
+	inc	hl
+
+	ld	a,(hli)			; fetch next vector
+	ld	(sndtmp),a
+	ld	a,(hl)
+	ld	(sndtmp+1),a
+
+	pop	hl				; save in current slot
+	ld	a,(sndtmp)
+	ld	(hli),a
+	ld	a,(sndtmp+1)
+	ld	(hl),a
+
+;	bump sound IDs
+
+	ld	hl,sndtype		; pointer to current ID
+	add	hl,bc	
+	inc	hl
+	ld	a,(hld)
+	ld	(hl),a
+
+;	bump sound control mask
+
+	ld	hl,sndmsk		; pointer to current mask
+	add	hl,bc
+	inc	hl
+	ld	a,(hld)
+	ld	(hl),a
+
+;	bump sound control cnt
+
+	ld	hl,sndcnt		; pointer to current cnt
+	add	hl,bc
+	inc	hl
+	ld	a,(hld)
+	ld	(hl),a
+
+;	advance through list
+
+	inc	c				; next slot please
+	jr	killsnd2
+
+;------------------------------------
+;
+;   Disable current sound
+;
+;------------------------------------
+
+sound_off
+
+	ld	hl,sndmsk		; reset lock out status
+	add	hl,bc
+	ld	a,(hl)			; fetch control mask
+	ld	(synct1),a			
+	cpl					; and complement
+
+	ld	hl,sndlock		; reset lockout flags
+	and	(hl)
+	ld	(hl),a
+
+;	turn off genrators
+
+	push	bc				; save slot index
+
+	ld	c,3				; disable sounds as appropriate
+
+l0	ld	a,(synct1)		; fetch control mask
+
+	ld	hl,sndposmsk	; this channel used?
+	add	hl,bc
+	and	(hl)	  		
+
+	call	nz,gen_off		; if yes, turn it off
+
+	dec	c				; next channel
+	bit     7,c
+	jr	z,l0
+
+	pop	bc				; recover slot index
+
+	ret
+
+;------------------------------------
+;
+;   Play one shot Sound Effect
+;
+;	ID is index into one shot data
+;
+;------------------------------------
+
+play_one_shot
+
+	ld	hl,sndtype			;fetch sound ID
+	add	hl,bc
+	ld	a,(hl)
+
+	call	one_shot_snd
+
+	ld	de,one_shot_wait	;set service vector
+	jp	set_sndpnt
+
+;------------------------------------
+;
+;	Wait for end of effect
+;
+;
+;	bc - sound effect slot in queue
+;
+;------------------------------------
+
+one_shot_wait
+
+	ld	hl,sndcnt		; sound length timer
+	add	hl,bc
+
+	dec	(hl)			; tick!
+
+	ld	a,(hl)			; done?
+	cp	0
+	ret	nz
+
+	jp	killsnd			; remove sound from queue
+
+;------------------------------------
+;
+;   Play one shot Sound Effect
+;
+;   Reg a contains the sound ID
+;
+;------------------------------------
+
+one_shot_snd
+
+	sla	a				;index one shot records * 6 bytes
+	ld	e,a	
+	sla	e 
+	add	a,e
+	ld	e,a
+
+	ld	hl,one_shot_tab	;calc base of record
+	add	hl,de
+
+	push	hl				;save base
+
+	ld	e,5				;adjust index
+	add	hl,de
+
+ 	ld	a,(hl)			;fetch channel spec
+	rra
+	rra
+	rra
+	and	%00000111
+
+	ld	e,a				;save channel spec
+
+	pop	hl
+
+	ld	a,(NR51)		;fetch and set enable bits
+	or	(hl)
+	ld	(NR51),a
+
+	inc	hl				;advance to next byte
+
+;       read data into sound gen 1
+
+	ld	a,e				;test channel spec	
+	cp	0
+	jr	nz,sgen2
+
+	ld      a,(hli)
+	ld      (NR10),a		;set sweep
+	ld      a,(hli)
+	ld      (NR11),a		;set wave/length
+	and	$3f
+	push	af
+
+	ld      a,(hli)
+	ld      (NR12),a		;set envelope
+	ld      a,(hli)
+	ld      (NR13),a		;set freq low
+	ld      a,(hl)
+	and	%11000111
+	ld      (NR14),a		;set restart/continuous/freq hi
+	jp	genvars
+
+
+;       read data into sound gen 2
+
+sgen2
+	cp	1
+	jr	nz,sgen4
+
+	inc	hl				;no sweep on driver 2
+	ld      a,(hli)
+	ld      (NR21),a		;set wave/length
+	and	$3f
+	push	af
+	ld      a,(hli)
+	ld      (NR22),a		;set envelope
+	ld      a,(hli)
+	ld      (NR23),a		;set freq low
+	ld      a,(hl)
+	and	%11000111
+	ld      (NR24),a		;set restart/continuous/freq hi
+	jp	genvars
+
+;       read data into sound gen 4
+
+sgen4
+	inc	hl					;no sweep on driver 4
+
+	ld      a,(hli)	 			;set length	- nr41
+	ld      (NR41),a 
+	push	af
+
+	ld      a,(hli)				;set envelope - nr42
+	ld      (NR42),a
+
+	ld      a,(hli)		 		;set freq - nr43
+	ld      (NR43),a	 
+
+	ld      a,(hl)		   		;set restart/continuous flags
+	and	%11000000
+	ld      (NR44),a
+
+genvars
+
+	ld	hl,sndcnt			;set cnt
+	add	hl,bc
+	pop	af
+	ld	(hl),a
+
+	ld	hl,sndposmsk		;fetch control flag
+	add	hl,de
+	ld	a,(hl)
+
+	ld	hl,sndmsk			;set control mask
+	add	hl,bc
+	ld	(hl),a
+
+	ld	hl,sndlock			;set lock out flags
+	or	(hl)
+	ld	(hl),a
+
+	ret
+
+;------------------------------------
+;
+;   SET_SNDPNT
+;
+;   Set new routine vector
+;
+;	bc - sound effect slot in queue
+;	de - new vector for slot
+;
+;------------------------------------
+	
+set_sndpnt
+
+	ld	hl,sndpnt		; point into slot
+	add	hl,bc
+	add	hl,bc
+	ld	a,d	   			; set new vector
+	ld	(hli),a
+	ld	a,e
+	ld	(hl),e
+
+	ld	d,0				; fix reg d
+
+	ret
+	
+;------------------------------------
+;
+;	Sound drivers and data
+;
+;------------------------------------
+
+ch1	equ	0*8
+ch2	equ	1*8
+ch3	equ	2*8
+ch4	equ	3*8
+c1en	equ	$11
+c2en	equ	$22
+c3en	equ	$44
+c4en	equ	$88
+
+;
+;-------------------------------------
+;
+	ifdef	bart
+	ifdef	devapd
+	include	bart\bart.snd
+	else
+	include	bart.snd
+	endif
+	endif
+;
+;-------------------------------------
+;
+	ifdef	turn
+	ifdef	devapd
+	include	turn\turn.snd
+	else
+	include	turn.snd
+	endif
+	endif
+;
+;-------------------------------------
+;
+	ifdef	home
+	ifdef	devapd
+	include	home\home.snd
+	else
+	include	frog.snd
+	endif
+	endif
+;
+;
+;-------------------------------------
+;
+soundend
+soundsize	equ	soundend-soundstart
+;
+

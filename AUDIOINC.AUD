@@ -1,0 +1,69 @@
+;       file: audioinc.aud
+;
+;       this file contains definitions specific to the DMG hardware
+;
+;       sound registers
+;
+nr10    equ     $FF10           ; sound-1       sweep
+nr11    equ     $FF11           ;               duty/length
+nr12    equ     $FF12           ;               envelope
+nr13    equ     $FF13           ;               frequency (low byte)
+nr14    equ     $FF14           ;               frequency (high byte)
+
+nr21    equ     $FF16           ; sound-2       duty/length
+nr22    equ     $FF17           ;               envelope
+nr23    equ     $FF18           ;               frequency (low byte)
+nr24    equ     $FF19           ;               frequency (high byte)
+
+nr30    equ     $FF1A           ; sound-3       off
+nr31    equ     $FF1B           ;               length
+nr32    equ     $FF1C           ;               output level
+nr33    equ     $FF1D           ;               frequency (low byte)
+nr34    equ     $FF1E           ;               frequency (high byte)
+
+nr41    equ     $FF20           ; sound-3(4?)   length
+nr42    equ     $FF21           ;               envelope
+nr43    equ     $FF22           ;               frequency
+nr44    equ     $FF23           ;               ionitial/sequence
+
+nr50    equ     $FF24           ;so1/so2 level
+nr51    equ     $FF25           ;so1/so2 allocation
+nr52    equ     $FF26           ;end flag
+
+wfram   equ     $FF30           ;wave form RAM
+;
+;
+;--------------------------------------
+;
+	ifdef	bart
+	ifdef	devapd
+	include	bart\bartdef.snd
+	else
+	include	bartdef.snd
+	endif
+	endif
+;
+;--------------------------------------
+;
+	ifdef	turn
+	ifdef	devapd
+	include	turn\turndef.snd
+	else
+	include	turndef.snd
+	endif
+	endif
+;
+;--------------------------------------
+;
+	ifdef	home
+	ifdef	devapd
+	include	home\homedef.snd
+	else
+	include	homedef.snd
+	endif
+	endif
+;
+;--------------------------------------
+;
+;
+

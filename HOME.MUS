@@ -1,0 +1,502 @@
+;****************************************
+;*										*
+;* 			    HOME.MUS				*
+;*										*
+;*	  	 "Home Alone - GameBoy"			*
+;*										*
+;*			     MUSIC					*
+;*										*
+;* Copyright (c) 1991 Imagineering, Inc.*
+;*										*
+;****************************************
+;
+;
+;	Prepared for Imagineering, Inc. by
+;
+;		Stuart E. Ross
+;		New Potato Technologies
+;		P.O. Box 187
+;		Danbury, CT  06813
+;
+;		TEL:  (203) 746-9040
+;		FAX:  (203) 746-6929
+;
+;
+;--------------------------------------
+
+
+;--------------------------------------------
+;
+;  stereo panpot settings for each song
+;
+;--------------------------------------------
+
+sngpan  equ     $-1
+
+	db      %11011110       ;1
+	db      %11111111       ;2
+	db      %11011011       ;3
+	db      %10111101       ;4
+	db      %11011011       ;5
+	db      %10111101       ;6
+	db      %11011011       ;7
+
+;--------------------------------------
+;
+;	Instrument Initial Control Data
+;
+;--------------------------------------
+
+mute	equ	$-4				; driver mute table
+
+;		-A- -B- -C- -D-		
+
+	db	$00,$00,$00,$00		;1
+	db	$00,$00,$00,$00		;2
+	db	$00,$00,$00,$00		;3
+	db	$00,$00,$00,$00		;4
+	db	$00,$00,$00,$00		;5
+	db	$00,$00,$00,$00		;6
+	db	$00,$00,$00,$00		;7
+
+instyp				;instrument specification data
+
+	;-------------
+	if	song1		; Theme - DTseq 1
+	;-------------
+home1ins
+	db	I_PLUKBASS + $C0 	; s1d3ch06 [sound 1]
+	db	I_PLUKBASS + $E0 	; s1d2ch08 [sound 2]
+	db	I_BASIC + $80		; was $f0 s1d1ch07 [sound 3]
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song2		; Nut Run - DTseq 2
+	;-------------
+home2ins
+	db	I_PLUKSTR1 + $80	; s2d1ch04	
+	db	I_PLUKBASSX + $D0 	; s2d2ch08	
+	db	I_PLUKBASSX + $80	;was d0 s2d2ch07	
+	db  I_BASIC + $F0 		; s2d3ch01	
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song3		; RUNchuka
+	;-------------
+home3ins
+	db	I_PLUKBASS + $C0	; s6d1ch10
+	db	I_PLUKSTR1 + $C0 	; s6d2ch06
+	db	I_BASIC    + $F0 	; s6d3ch01
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song4		; spookRUN 
+	;-------------
+home4ins
+	db	I_PLUKBASS + $C0 	; s6d1ch10
+	db	I_PLUKSTR1 + $C0 	; s6d2ch06
+	db	I_BASIC + $F0 		; s6d3ch01
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song5		; DEAD
+	;-------------
+home5ins
+	db	I_PLUKBASS + $C0 	; s6d1ch10
+	db	I_PLUKSTR1 + $80 	; was c0 s6d2ch06
+	db	I_BASIC + $f0 		; s6d3ch01
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song6		; acomplsh
+	;-------------
+home6ins
+	db	I_PLUKBASS + $C0 	; s6d1ch10
+	db	I_PLUKSTR1 + $C0 	; s6d2ch06
+	db	I_BASIC + $F0 		; s6d3ch01
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song7		; memryRUN
+	;-------------
+home7ins
+	db	I_PLUKBASS + $C0		; s7d1ch08
+	db	I_PLUKSTR1 + $C0	 	; s7d2ch06
+	db	I_BASIC + $F0 			; s7d3ch07
+
+	;-------------
+	endif
+	;-------------
+
+;--------------------------------------
+;
+;     Sequence Data Specification
+;
+;--------------------------------------
+
+sngtab	equ	$-8		;pointers to driver sequences
+
+	;-------------
+	if	song1
+	;-------------
+	dw	0+s1d1sl
+	dw	0+s1d2sl
+	dw	0+s1d3sl
+	dw	0+s1d4sl
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song2
+	;-------------
+	dw	0+s2d1sl 
+	dw	0+s2d2sl
+	dw	0+s2d3sl
+	dw	0+s2d4sl
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song3
+	;-------------
+	dw	0+s3d1sl 
+	dw	0+s3d2sl
+	dw	0+s3d3sl
+	dw	0+s3d4sl
+	;-------------
+	endif
+	;-------------
+
+	;-------------
+	if	song4
+	;-------------
+	dw	0+s4d1sl 
+	dw	0+s4d2sl
+	dw	0+s4d3sl
+	dw	0+s4d4sl
+	;-------------
+	endif
+	;-------------
+
+	;-------------
+	if	song5
+	;-------------
+	dw	0+s5d1sl 
+	dw	0+s5d2sl
+	dw	0+s5d3sl
+	dw	0+s5d4sl
+	;-------------
+	endif
+	;-------------
+
+	;-------------
+	if	song6
+	;-------------
+	dw	0+s6d1sl 
+	dw	0+s6d2sl
+	dw	0+s6d3sl
+	dw	0+s6d4sl
+	;-------------
+	endif
+	;-------------
+
+	;-------------
+	if	song7
+	;-------------
+	dw	0+s7d1sl 
+	dw	0+s7d2sl
+	dw	0+s7d3sl
+	dw	0+s7d4sl
+	;-------------
+	endif
+	;-------------
+
+
+
+;--------------------------------------
+;
+;
+;	measure list
+;	-------------------------
+;   "ml"	sn	sq	d
+;
+;	measure
+;	-------------------------
+;	"m"	mn	sn	sq	d
+;
+;
+;--------------------------------------
+
+	;-------------
+	if	song1			; Theme - DTseq1
+	;-------------
+
+home1start
+
+s1d1sl
+	dw	ml111
+	dw	endsng
+s1d2sl
+	dw	ml112
+	dw	endsng
+s1d3sl
+	dw	ml113
+	dw	endsng
+s1d4sl
+	dw	ml114
+	dw	endsng
+;
+	include	frog_s1.sq1
+
+;
+home1end
+home1size	equ	home1end-home1start
+;
+	;-------------
+	endif
+	;-------------
+;
+ 	;-------------
+	if	song2			; NUT RUN 
+	;-------------
+
+home2start
+
+s2d1sl
+	dw	ml211
+	dw	endsng
+s2d2sl
+	dw	ml212
+	dw	endsng
+s2d3sl
+	dw	ml213
+	dw	endsng
+s2d4sl
+	dw	ml214
+	dw	endsng
+
+	include	frog_s2.sq1
+
+home2end
+home2size	equ	home2end-home2start
+
+	;-------------
+	endif
+	;-------------
+
+ 	;-------------
+	if	song3			; runchuka
+	;-------------
+
+home3start
+
+s3d1sl
+	dw	ml311
+	dw	endsng
+s3d2sl
+	dw	ml312
+	dw	endsng
+s3d3sl
+	dw	ml313
+	dw	endsng
+s3d4sl
+	dw	ml314
+	dw	endsng
+
+	ifdef	devapd
+	include	s3.sq1
+	else
+	include	home_s3.sq1
+	endif
+
+home3end
+home3size	equ	home3end-home3start
+
+	;-------------
+	endif
+	;-------------
+
+ 	;-------------
+	if	song4			; spookrun
+	;-------------
+
+home4start
+
+s4d1sl
+	dw	ml411
+	dw	endsng
+s4d2sl
+	dw	ml412
+	dw	endsng
+s4d3sl
+	dw	ml413
+	dw	endsng
+s4d4sl
+	dw	ml414
+	dw	endsng
+
+	ifdef	devapd
+	include	s4.sq1
+	else
+	include	home_s4.sq1
+	endif
+
+home4end
+home4size	equ	home4end-home4start
+
+	;-------------
+	endif
+	;-------------
+
+ 	;-------------
+	if	song5			; DEAD
+	;-------------
+
+home5start
+
+s5d1sl
+	dw	ml511
+	dw	endsng
+s5d2sl
+	dw	ml512
+	dw	endsng
+s5d3sl
+	dw	ml513
+	dw	endsng
+s5d4sl
+	dw	ml514
+	dw	endsng
+
+	include	frog_s5.sq1
+
+home5end
+home5size	equ	home5end-home5start
+
+	;-------------
+	endif
+	;-------------
+
+ 	;-------------
+	if	song6			; acomplsh
+	;-------------
+
+home6start
+
+s6d1sl
+	dw	ml611
+	dw	endsng
+s6d2sl
+	dw	ml612
+	dw	endsng
+s6d3sl
+	dw	ml613
+	dw	endsng
+s6d4sl
+	dw	ml614
+	dw	endsng
+
+	include	frog_s6.sq1
+
+home6end
+home6size	equ	home6end-home6start
+
+	;-------------
+	endif
+	;-------------
+
+ 	;-------------
+	if	song7			; MemryRun
+	;-------------
+
+home7start
+
+s7d1sl
+	dw	ml711
+	dw	endsng
+s7d2sl
+	dw	ml712
+	dw	endsng
+s7d3sl
+	dw	ml713
+	dw	endsng
+s7d4sl
+	dw	ml714
+	dw	endsng
+
+	ifdef	devapd
+	include	s7.sq1
+	else
+	include	home_s7.sq1
+	endif
+
+home7end
+home7size	equ	home7end-home7start
+
+	;-------------
+	endif
+	;-------------
+
+;--------------------------------------
+;
+;     Tempo Specifications
+;
+;--------------------------------------
+
+tempos	equ	$-1		;song tempos
+	;-------------
+	if	song1
+	;-------------
+	db	tempo1
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song2
+	;-------------
+	db	tempo2
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song3
+	;-------------
+	db	tempo3
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song4
+	;-------------
+	db	tempo4
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song5
+	;-------------
+	db	tempo5
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song6
+	;-------------
+	db	tempo6
+	;-------------
+	endif
+	;-------------
+	;-------------
+	if	song7
+	;-------------
+	db	tempo7
+	;-------------
+	endif
+	;-------------
+;
+

@@ -1,0 +1,56 @@
+;HOME ALONE sound and music, separate module
+
+
+home	equ	1
+
+	include audio.inc
+
+	org	$C0A0
+	include	"audionff.aud"	;music handler main RAM
+
+	if $>$C0A0+$60
+	pseudwarn *** Overflow of $C000 RAM ***
+	endif
+
+
+	org	$FF8A
+
+	include	"audioffp.aud"	;music handler $FF00 RAM
+
+	if $>$FF8A+$30
+	pseudwarn *** Overflow of $FF00 variable space ***
+	endif
+
+	thisbank 2
+	org	$4000
+
+	jp	music
+	jp	setseq
+	jp	alloff
+	jp	sound
+	jp	setsnd
+	jp	killid
+
+
+	include	music.aud	;music handler
+	include	sound.aud	;sound effects
+	include	common.aud
+
+	include home.mus
+
+endmus
+
+	if $>$5d80
+	pseudwarn *** Music handler exceeded assigned space ***
+	endif
+
+
+	dumpsym "mus.sym"
+
+
+	end
+
+
+
+
+

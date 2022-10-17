@@ -1,0 +1,3 @@
+Comparing files FROGSUBS.DMG and FROGSUBS.OLD
+FC: no differences encountered
+

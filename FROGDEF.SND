@@ -1,0 +1,76 @@
+;****************************************
+;*								*
+;*            HOMEDEF.SND				*
+;*	    							*
+;*       "Home Alone - GameBoy"			*
+;*		   						*
+;*     SOUND AND MUSIC DEFINITIONS	 	*
+;*		   						*
+;* Copyright (c) 1991 Imagineering, Inc.*
+;*		   						*
+;****************************************
+;
+;
+;   Prepared for Imagineering, Inc. by
+;
+;   	Stuart E. Ross
+;   	New Potato Technologies
+;   	P.O. Box 187
+;   	Danbury, CT  06813
+;
+;   	TEL:  (203) 746-9040
+;   	FAX:  (203) 746-6929
+;
+
+;--------------------------------
+;   HOMEII Song Definitions
+;--------------------------------
+
+;	setting these to 0 will snub out a song
+
+song1	equ	1			;theme song
+song2	equ	1			;nutRUN
+song3	equ	1			;RUNchuka
+song4	equ	1			;spookRUN
+song5	equ	1			;DEAD
+song6	equ	1			;acomplsh
+song7	equ	1			;memryRUN
+
+min_song_id equ $01
+max_song_id equ $07
+
+themsng		equ	$01		; song1
+nutsng		equ	$02		; song2
+chucksng	equ	$03		; song3
+spooksng	equ	$04		; song4
+deadsng 	equ	$05		; song5
+acmpsng		equ	$06		; song6
+memrysng	equ	$07		; song7
+
+;--------------------------------
+;   HOME Sound Definitions
+;--------------------------------
+
+min_snd_id equ $00
+max_snd_id equ $0e
+
+;
+
+sx_open		equ	$80		; Open door or drawer                    
+sx_glitter 	equ	$81		; Tooth glitter on game over             
+sx_boyhit  	equ	$82		; Boy takes a hit                        
+sx_enmyhit	equ	$83		; Enemy takes a hit                      
+sx_enmygone	equ	$84		; Enemy removed                          
+sx_bosshit	equ	$85		; Boss enemy hit                         
+sx_treasure	equ	$86		; Boy gets treasure                      
+sx_boygets	equ	$87		; Boy gets item  (weapon, coin, etc.)    
+sx_dropchute	equ	$88		; Drop item in chute                     
+sx_objfall	equ	$89		; General falling object sound           
+sx_thump	equ	$8a		; General thump (bowling ball, etc.)     
+sx_oneup	equ	$8b		; One-up                                 
+sx_button	equ	$8c		; Select/start                           
+sx_bigboom	equ	$8d		; big explosion
+sx_bonus	equ	$8e		; bonus award
+
+;
+

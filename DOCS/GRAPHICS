@@ -1,0 +1,39 @@
+Graphics for Frogger
+
+GameBoy
+
+(note -- final decision hasn't been made whether to have
+objects one cell high or two cells high.)
+
+
+Frog			       frames	   	size
+	facing forward		  1	 	approx.12x9 pixels
+	jumping forward		  1	 	approx. 12x14 
+	facing to the side	  1	 	approx  9x8 
+	jumping to the side	  1	 	approx  12x8
+	death sequence		  ?	   	?
+
+Log 	varying lengths		  1		2 end chars., 1 middle char.
+Turtle	swimming		  3 or 4	? x 8 pixels
+	sinking			  3		? x 8
+car1				  2		? x 8
+car2				  2		? x 8
+car3				  2		? x 8
+car4				  2		? x 8
+car5				  2 		? x 8
+female frog			  1  		same as frog
+fly				  1		approx 8 x 8
+alligator			  2		28(?) x 8
+gator head			  1		12 x 8
+otter				  1 		12 x 8
+snake				  1 or 2	16 x 8
+brick walkway			  1		160 x 8
+destination holes		  1		160 x 12 or 16
+teddy bear (frog in hole)	  1		12 x 12
+
+Alphanumeric character set
+Title screen
+Game Over screen
+Timer bar 			  1		80 x 8
+Frog (men left icon)		  1		8 x 8 
+

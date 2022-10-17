@@ -1,0 +1,105 @@
+;HOME_S4.SQ1
+
+;**************
+;*   Song 4   *
+;**************
+
+
+;******************
+;*   Sequence 1   *
+;******************
+
+
+;instrument list
+
+s4d1ch10	equ	home4ins-instyp
+s4d2ch06	equ	s4d1ch10+1
+s4d3ch01	equ	s4d2ch06+1
+
+tempo4		equ	200
+
+;Driver #1
+
+ml411 
+	dw	m01411
+	dw	mend
+
+m01411
+	db	prgcng,s4d1ch10,normal
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+	db	 006,en5+00,002	;ch10
+	db	 006,cn5+00,002	;ch10
+	db	 012,an5+00,006	;ch10
+	db	 006,gn4+00,002	;ch10
+	db	 018,cn5+00,010	;ch10
+	db	mend
+
+;Driver #2
+
+ml412 
+	dw	m05412
+	dw	mend
+
+m05412
+	db	prgcng,s4d2ch06,normal
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+	db	 006,en5+00,002	;ch10
+	db	 006,cn5+00,002	;ch10
+	db	 012,an5+00,006	;ch10
+	db	 006,gn4+00,002	;ch10
+	db	 018,cn5+00,010	;ch10
+	db	mend
+
+;Driver #3
+
+ml413 
+	dw	m08413
+	dw	mend
+
+m08413
+	db	prgcng,s4d3ch01,normal
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+;	db	 006,cn5+00,002	;ch10
+	db	 006,en5+00,002	;ch10
+	db	 006,cn5+00,002	;ch10
+	db	 012,an5+00,006	;ch10
+	db	 006,gn4+00,002	;ch10
+	db	 018,cn5+00,010	;ch10
+	db	mend
+
+;Driver #4
+
+ml414 
+	dw	m01414
+	dw	mend
+
+m01414
+;	db	 006,bassd1,003	;ch16
+;	db	 006,bassd1,002	;ch10
+;	db	 006,bassd1,002	;ch10
+;	db	 006,bassd1,002	;ch10
+;	db	 006,bassd1,002	;ch10
+;	db	 006,bassd1,002	;ch10
+	db	 006,snare1,002	;ch10
+	db	 006,snare1,002	;ch10
+	db	 006,snare1,002	;ch10
+	db	 012,snare1,002	;ch10
+	db	 006,snare1,002	;ch10
+	db	 018,snare1,002	;ch10
+	db	mend
+
+

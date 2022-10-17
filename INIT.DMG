@@ -1,0 +1,145 @@
+
+; *****************
+; *** ROM Start ***
+; *****************
+
+
+	thisbank -1		;bank 0
+	otherbank 1
+
+
+
+	org	$150		
+
+
+
+;**********************
+;*** Initialization ***
+;**********************
+
+g
+	ld	b,60
+	ld	hl,cannedhi
+	ld	de,hiscores
+l0
+	ld	a,(hli)
+	ld	(de),a
+	inc	de
+	dec	b
+	jr	nz,l0
+	xor	a
+	ld	(firststart),a
+	ld	(titleflag),a
+g1
+	ld      sp,$DFF0	;Stack  (leave $10 for flags)
+
+	call	Init_MBC
+	xor	a
+	ld	(firststart),a
+restart				;warm start 
+	ld      sp,$DFF0	
+	ld	a,1
+	call	set_bank
+	call    lcd_off		;Stop LCD
+	ld	hl,$FF80	;Clear RAM internal to DMG chip
+	ld	c,$7F		;Clear object buffer in work RAM
+	call	zero_ram_c
+
+	ld	hl,$C000	;Clear work RAM (includes object buffer)
+	ld	bc,$1F00	;Don't clear top 16 bytes (stack)
+	call	zero_ram_bc
+
+	ld	hl,$8000	;clear all video ram
+	ld	bc,$2000
+	call	zero_ram_bc
+
+	call    dmaset		;Transfer dma_to_OAM program to DMG chip RAM
+
+
+;Setup interrupts
+
+	ld	a,$40		;Select LCY=LY Coincidence interrupt
+	ld	(STAT),a
+
+
+
+	xor	a		;Cancel pending interrupts
+	ld	(.IF),a		;This prevents an immediate "keyboard" interrupt
+
+	ld	a,%00010011	;Key, LCDC, V-Blank
+	ld      (IE),a		;Interrupt Enable
+
+
+	call	newlogos
+
+
+	ld	a,$e4	
+	ld	(BGP),a
+	ld	a,$c4
+	ld	(OBP0),a
+	ld	a,$84
+	ld	(OBP1),a
+
+
+
+
+
+	if	wholegame
+;	xor	a		;title screen
+;	ld	(whichpic),a
+;	call	getpic
+;	ld	a,screendel
+;	ld	(picdel),a
+
+	ld	a,lmode
+	ld	(mode),a
+	ld	a,$ff
+	ld	(whichpic),a
+	call	showlogo2
+	ld	a,4	;screendel
+	ld	(picdel),a
+	
+	else
+
+	call 	initscreen
+	call	initnewgame
+	call	initfrog	;temp for testing
+	call	initdata	;temp
+	ld	a,gmode
+	ld	(mode),a	
+	endif
+
+
+	ld	a,3		;sprites and bgnd enabled
+	ld	(LCDC),a
+	call	lcd_on
+	ei                      ;Enable interrupts
+
+	ld	a,$d4
+	ld	(random),a
+
+;	call	coldinit
+
+	ld	a,$1
+	ld	(audtest),a
+
+;	ld	a,
+;	call	gsetseq
+
+	jp	main
+
+
+; init subroutines
+
+	nop
+	nop
+	nop
+finder
+	jp	finder	;for locationg labels when symbol table is full
+	jp 	getpic
+	nop
+	jp	p1menleft
+	jp	p2menleft
+	dw	score
+	nop
+

@@ -1,0 +1,56 @@
+collisions			;need to test for characters
+				;and for sprites
+
+				;trial code -- put character under frog
+
+	ld	a,(frogx)	
+	sub	4
+	srl	a		
+	srl	a
+	srl	a		;x/8
+	ld	bc,$9800	;point to screen
+	ld	c,a
+
+
+	ld	a,(frogy)
+	sub	$10		;adjust for sprite positioning
+				;(seems offset from screen values)
+	ld	l,a
+	ld	a,(yscroll)
+	add	a,l		;frog's actuall y position
+
+	ld	e,a		;save for index into lane scroll values
+
+	and	$f8		;lose lower 3 bits
+	ld	l,a
+	ld	h,0
+	add	hl,hl		;*2 (really * 16)
+	add	hl,hl		;*4
+	add	hl,bc		;add in screen start and x position
+
+				;now adjust for x scrolling
+
+	ld	a,e		;y position
+	sub	$10		;highest position
+	sra	a		; /8
+	sra	a
+	sra	a		;should be index into lane scrolls
+	ld	de,xlane
+	add	a,e
+	ld	e,a
+	jr	nc,col2
+	inc	d
+col2
+	ld	a,(de)
+	add	a,l
+	jr	nc,col3
+	inc	h
+col3
+				;test for now
+	ld	a,2
+	ld	(hl),a
+	
+	ret
+
+
+

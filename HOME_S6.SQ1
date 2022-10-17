@@ -1,0 +1,128 @@
+;HOME_S6.SQ1
+
+;**************
+;*   Song 6   *
+;**************
+
+
+;******************
+;*   Sequence 1   *
+;******************
+
+
+;instrument list
+
+s6d1ch10	equ	home6ins-instyp
+s6d2ch06	equ	s6d1ch10+1
+s6d3ch01	equ	s6d2ch06+1
+
+tempo6		equ	119
+
+;Driver #1
+
+ml611 
+	dw	m02611
+	dw	mend
+
+m02611
+	db	prgcng,s6d1ch10,normal
+	db	 012,cn4+00,011	;ch10
+	db	 012,gn3+00,011	;ch10
+	db	 012,an3+00,011	;ch10
+	db	 012,en3+00,011	;ch10
+	db	 012,fn3+00,011	;ch10
+	db	 012,gn3+00,011	;ch10
+	db	 006,cn3+00,005	;ch10
+	db	mend
+
+;Driver #2
+
+ml612 
+	dw	m01612
+	dw	m02612
+	dw	m01612
+	dw	m05612
+	dw	m02612
+	dw	m01612
+	dw	m06612
+	dw	m02612
+	dw	m02612
+	dw	m07612
+	dw	mend
+
+m01612
+	db	prgcng,s6d2ch06,normal
+	db	 006,gn5+00,002	;ch06
+	db	 006,gn5+00,002	;ch06
+	db	mend
+
+m02612
+	db	 003,gn5+00,002	;ch06
+	db	 003,an5+00,002	;ch06
+	db	mend
+
+m05612
+	db	 006,gn5+00,002	;ch06
+	db	mend
+
+m06612
+	db	 006,gn5+00,002	;ch06
+	db	mend
+
+m07612
+	db	 006,cn6+00,002	;ch06
+	db	mend
+
+;Driver #3
+
+ml613 
+	dw	m02613
+	dw	mend
+
+m02613
+	db	prgcng,s6d3ch01,normal
+	db	 006,en5+00,003	;ch01
+	db	 006,en5+00,003	;ch01
+	db	 003,en5+00,003	;ch01
+	db	 003,ds5+00,003	;ch01
+	db	 006,en5+00,003	;ch01
+	db	 006,cn6+00,003	;ch01
+	db	 006,cn6+00,003	;ch01
+	db	 003,cn6+00,003	;ch01
+	db	 003,bn5+00,002	;ch01
+	db	 006,cn6+00,003	;ch01
+	db	 006,en6+00,003	;ch01
+	db	 006,en6+00,003	;ch01
+	db	 003,en6+00,003	;ch01
+	db	 003,ds6+00,003	;ch01
+	db	 003,en6+00,003	;ch01
+	db	 003,gn6+00,003	;ch01
+	db	 006,cn6+00,003	;ch01
+	db	mend
+
+;Driver #4
+
+ml614 
+	dw	m01614
+	dw	m01614
+	dw	m01614
+	dw	m04614
+	dw	mend
+
+m01614
+	db	 006,snare1,002	;ch16
+	db	 003,snare1,002	;ch16
+	db	 003,snare1,002	;ch16
+	db	 006,snare1,002	;ch16
+	db	 006,snare1,002	;ch16
+	db	mend
+
+m04614
+	db	 006,snare1,002	;ch16
+	db	mend
+
+;MIDI events found   = 57
+;records generated   = 34
+;percent compression = 40
+;total bytes output  = 136
+

@@ -1,0 +1,156 @@
+;HOME_S2.SQ1
+
+;**************
+;*   Song 2   *
+;**************
+
+
+;******************
+;*   Sequence 1   *
+;******************
+
+
+;instrument list
+
+s2d1ch04	equ	home2ins-instyp
+s2d2ch08	equ	s2d1ch04+1
+s2d2ch07	equ	s2d2ch08+1
+s2d3ch01	equ	s2d2ch07+1
+
+tempo2		equ	150+20
+
+;Driver #1
+
+ml211 
+	dw	m01211
+	dw	mend
+
+m01211
+	db	prgcng,s2d1ch04,normal
+	db	6,Fs4,4
+	db	6,Gs4,4
+	db	6,As4,4
+	db	6,Bn4,4
+	db	12,Cs5,10
+	db	12,As4,10
+	db	6,Fs4,4
+	db	6,Gs4,4
+	db	6,As4,4
+	db	6,Gs4,4
+	db	12,Fs4,10
+	db	12,Fs4,10
+	db	6,Fs4,4
+	db	6,Gs4,4
+	db	6,As4,4
+	db	6,Bn4,4
+	db	12,Cs5,10
+	db	12,As4,10
+	db	6,Cs5,4
+	db	6,Bn4,4
+	db	6,As4,4
+	db	6,Gs4,4
+	db	12,Fs4,10
+	db	mend
+
+;Driver #2
+
+ml212 
+	dw	m01212
+	dw	mend
+m01212
+	db	prgcng,s2d2ch08,normal
+	db	6,Fs4,4
+	db	6,Gs4,4
+	db	6,As4,4
+	db	6,Bn4,4
+	db	12,Cs5,10
+	db	12,As4,10
+	db	6,Fs4,4
+	db	6,Gs4,4
+	db	6,As4,4
+	db	6,Gs4,4
+	db	12,Fs4,10
+	db	12,Fs4,10
+	db	6,Fs4,4
+	db	6,Gs4,4
+	db	6,As4,4
+	db	6,Bn4,4
+	db	12,Cs5,10
+	db	12,As4,10
+	db	6,Cs5,4
+	db	6,Bn4,4
+	db	6,As4,4
+	db	6,Gs4,4
+	db	12,Fs4,10
+	db	mend
+
+;Driver #3
+
+ml213 
+	dw	m01213
+	dw	mend
+m01213
+	db	prgcng,s2d3ch01,normal
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Fs2,4
+	db	6,Cs3,4
+	db	6,Gs2,4
+	db	6,Ds3,4
+	db	6,Gs2,4
+	db	6,Ds3,4
+	db	6,fs2,4		;12,Fs2,10
+	db	mend
+
+;Driver #4
+
+ml214 
+	dw	m01214
+	dw	mend
+
+m01214
+	db	6,snare1,4
+	db	6,snare1,4
+	db	6,snare1,4
+	db	6,snare1,4
+	db	12,snare1,10
+	db	12,snare1,10
+	db	6,snare1,4
+	db	6,snare1,4
+	db	6,snare1,4
+	db	6,snare1,4
+	db	12,snare1,10
+	db	12,snare1,10
+	db	6,snare1,4
+	db	6,snare1,4
+	db	6,snare1,4
+	db	6,snare1,4
+	db	12,snare1,10
+	db	12,snare1,10
+	db	6,snare1,4
+	db	6,snare1,4
+	db	6,snare1,4
+	db	6,snare1,4
+	db	12,snare1,10
+	db	mend
+

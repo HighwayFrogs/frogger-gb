@@ -1,0 +1,806 @@
+;INFOTHEM.SQ1
+
+;**************
+;*   Song 1   *
+;**************
+
+
+;******************
+;*   Sequence 1   *
+;******************
+
+
+;instrument list
+
+s1d1ch07	equ	info1ins-instyp
+s1d2ch06	equ	s1d1ch07+1
+s1d3ch01	equ	s1d2ch06+1
+
+tempo1		equ	249
+
+;Driver #1
+
+ml111 
+	dw	m01111
+	dw	m01111
+	dw	m02111
+	dw	m02111
+	dw	m03111
+	dw	m03111
+	dw	m03111
+	dw	m03111
+	dw	m01111
+	dw	m01111
+	dw	m02111
+	dw	m02111
+	dw	m03111
+	dw	m03111
+	dw	m03111
+	dw	m03111
+	dw	m03111
+	dw	m03111
+	dw	m04111
+	dw	m04111
+	dw	m03111
+	dw	m03111
+	dw	m02111
+	dw	m02111
+	dw	m03111
+	dw	m03111
+	dw	m04111
+	dw	m04111
+	dw	m03111
+	dw	m03111
+	dw	m05111
+	dw	m05111
+	dw	m05111
+	dw	m05111
+	dw	m03111
+	dw	m03111
+	dw	m02111
+	dw	m02111
+	dw	m03111
+	dw	m03111
+	dw	m01111
+	dw	m01111
+	dw	m03111
+	dw	m03111
+	dw	m02111
+	dw	m02111
+	dw	m03111
+	dw	m03111
+	dw	m01111
+	dw	m01111
+	dw	m01111
+	dw	m01111
+	dw	m02111
+	dw	m02111
+	dw	m03111
+	dw	m03111
+	dw	m02111
+	dw	m02111
+	dw	m03111
+	dw	m03111
+	dw	m06111
+	dw	m06111
+	dw	m07111
+	dw	m07111
+	dw	m0c111
+	dw	m06111
+	dw	m07111
+	dw	m0d111
+	dw	m08111
+	dw	m09111
+	dw	m09111
+	dw	m0e111
+	dw	m08111
+	dw	m0f111
+	dw	m09111
+	dw	m09111
+	dw	m09111
+	dw	m10111
+	dw	mend
+
+m01111
+	db	prgcng,s1d1ch07,normal
+	db	 016,cs3+00,007	;ch07
+	db	 008,cs3+00,015	;ch07
+	db	 008,fs2+00,007	;ch07
+	db	 008,gs2+00,007	;ch07
+	db	 008,bn2+00,007	;ch07
+	db	mend
+
+m02111
+	db	 016,dn3+00,007	;ch07
+	db	 008,dn3+00,015	;ch07
+	db	 008,gn2+00,007	;ch07
+	db	 008,an2+00,007	;ch07
+	db	 008,cn3+00,007	;ch07
+	db	mend
+
+m03111
+	db	 016,en3+00,007	;ch07
+	db	 008,en3+00,015	;ch07
+	db	 008,an2+00,007	;ch07
+	db	 008,bn2+00,007	;ch07
+	db	 008,dn3+00,007	;ch07
+	db	mend
+
+m04111
+	db	 016,fs3+00,007	;ch07
+	db	 008,fs3+00,015	;ch07
+	db	 008,bn2+00,007	;ch07
+	db	 008,cs3+00,007	;ch07
+	db	 008,en3+00,007	;ch07
+	db	mend
+
+m05111
+	db	 016,gs3+00,007	;ch07
+	db	 008,gs3+00,015	;ch07
+	db	 008,cs3+00,007	;ch07
+	db	 008,ds3+00,007	;ch07
+	db	 008,fs3+00,007	;ch07
+	db	mend
+
+m06111
+	db	 008,an3+00,007	;ch07
+	db	 008,fs3+00,007	;ch07
+	db	 008,en3+00,007	;ch07
+	db	 016,bn3+00,007	;ch07
+	db	 008,bn3+00,007	;ch07
+	db	mend
+
+m07111
+	db	 008,gn3+00,007	;ch07
+	db	 008,en3+00,007	;ch07
+	db	 008,dn3+00,007	;ch07
+	db	 016,an3+00,007	;ch07
+	db	 008,an3+00,007	;ch07
+	db	mend
+
+m0c111
+	db	 008,an3+00,007	;ch07
+	db	 008,fs3+00,007	;ch07
+	db	 008,en3+00,007	;ch07
+	db	 016,bn3+00,007	;ch07
+	db	 008,bn3+00,007	;ch07
+	db	mend
+
+m0d111
+	db	 008,gn3+00,007	;ch07
+	db	 008,en3+00,007	;ch07
+	db	 008,dn3+00,007	;ch07
+	db	 016,an3+00,015	;ch07
+	db	 016,an3+00,007	;ch07
+	db	 016,en3+00,015	;ch07
+	db	mend
+
+m08111
+	db	 016,en3+00,007	;ch07
+	db	 016,en3+00,007	;ch07
+	db	mend
+
+m09111
+	db	 008,en3+00,007	;ch07
+	db	 016,en3+00,015	;ch07
+	db	mend
+
+m0e111
+	db	 008,en3+00,007	;ch07
+	db	mend
+
+m0f111
+	db	 016,en3+00,007	;ch07
+	db	mend
+
+m10111
+	db	 008,en3+00,007	;ch07
+	db	mend
+
+;Driver #2
+
+ml112 
+	ifnb
+	dw	m01112
+	dw	m01112
+	dw	m09112
+	dw	m01112
+	dw	m01112
+	dw	m0a112
+	dw	m02112
+	dw	m0b112
+	dw	m02112
+	dw	m0c112
+	dw	m03112
+	dw	m03112
+	dw	m04112
+	dw	m0d112
+	dw	m04112
+	dw	m0e112
+	dw	m05112
+	dw	m06112
+	dw	m06112
+	dw	m0f112
+	dw	m05112
+	dw	m10112
+	dw	m06112
+	dw	m06112
+	dw	m06112
+	dw	m11112
+	dw	mend
+
+m01112
+	db	prgcng,s1d2ch06,normal
+	db	 040,en4+00,039	;ch06
+	db	 024,bn4+00,022	;ch06
+	db	 008,an4+00,007	;ch06
+	db	 024,gs4+00,015	;ch06
+	db	mend
+
+m09112
+	db	 040,en5+00,039	;ch06
+	db	 024,cs5+00,023	;ch06
+	db	 008,bn4+00,007	;ch06
+	db	 024,an4+00,007	;ch06
+	db	 016,en5+00,015	;ch06
+	db	 008,cs5+00,007	;ch06
+	db	 016,bn4+00,015	;ch06
+	db	 056,gs4+00,047	;ch06
+	db	mend
+
+m0a112
+	db	 096,en5+00,079	;ch06
+	db	 024,en5+00,023	;ch06
+	db	 040,bn4+00,039	;ch06
+	db	 008,cs5+00,007	;ch06
+	db	 254,bn4+00,015	;ch06
+	db	 254,.rst  ,254	;ch06
+	db	 192,.rst  ,192	;ch06
+	db	 064,ds5+00,063	;ch06
+	db	 016,gs4+00,011	;ch06
+	db	 016,gs4+00,007	;ch06
+	db	 116,gs4+00,079	;ch06
+	db	 016,cs5+00,019	;ch06
+	db	mend
+
+m02112
+	db	 036,bn4+00,035	;ch06
+	db	 048,cs5+00,007	;ch06
+	db	 012,cs5+00,015	;ch06
+	db	 032,bn4+00,035	;ch06
+	db	 048,en5+00,011	;ch06
+	db	 016,cs5+00,019	;ch06
+	db	 032,bn4+00,031	;ch06
+	db	mend
+
+m0b112
+	db	 048,gs4+00,015	;ch06
+	db	 028,bn4+00,027	;ch06
+	db	 020,gs4+00,023	;ch06
+	db	 012,fs4+00,019	;ch06
+	db	 004,gs4+00,007	;ch06
+	db	 032,an4+00,007	;ch06
+	db	 016,cs5+00,019	;ch06
+	db	mend
+
+m0c112
+	db	 108,gs4+00,015	;ch06
+	db	 004,gs4+00,007	;ch06
+	db	 008,an4+00,007	;ch06
+	db	 096,gs4+00,095	;ch06
+	db	mend
+
+m03112
+	db	 096,an4+00,095	;ch06
+	db	 096,bn4+00,087	;ch06
+	db	mend
+
+m04112
+	db	 008,fs4+00,015	;ch06
+	db	 008,bn4+00,007	;ch06
+	db	 008,ds5+00,015	;ch06
+	db	 016,fs5+00,007	;ch06
+	db	 024,fs5+00,007	;ch06
+	db	 008,fs5+00,007	;ch06
+	db	 008,ds5+00,007	;ch06
+	db	 008,bn4+00,007	;ch06
+	db	 008,fs4+00,007	;ch06
+	db	 008,en4+00,007	;ch06
+	db	 008,an4+00,007	;ch06
+	db	 008,cs5+00,007	;ch06
+	db	 016,en5+00,007	;ch06
+	db	 024,en5+00,007	;ch06
+	db	 008,en5+00,007	;ch06
+	db	 008,cs5+00,007	;ch06
+	db	 008,an4+00,007	;ch06
+	db	mend
+
+m0d112
+	db	 008,en4+00,007	;ch06
+	db	mend
+
+m0e112
+	db	 016,en4+00,007	;ch06
+	db	 016,bn4+00,015	;ch06
+	db	mend
+
+m05112
+	db	 016,bn4+00,007	;ch06
+	db	 016,bn4+00,007	;ch06
+	db	mend
+
+m06112
+	db	 008,bn4+00,007	;ch06
+	db	 016,bn4+00,015	;ch06
+	db	mend
+
+m0f112
+	db	 008,bn4+00,007	;ch06
+	db	mend
+
+m10112
+	db	 016,bn4+00,007	;ch06
+	db	mend
+
+m11112
+	db	 008,bn4+00,007	;ch06
+	db	mend
+	endif
+
+;Driver #3
+
+ml113 
+	dw	m01113
+	dw	m01113
+	dw	m10113
+	dw	m02113
+	dw	m11113
+	dw	m01113
+	dw	m01113
+	dw	m12113
+	dw	m02113
+	dw	m03113
+	dw	m03113
+	dw	m04113
+	dw	m03113
+	dw	m05113
+	dw	m03113
+	dw	m06113
+	dw	m05113
+	dw	m06113
+	dw	m07113
+	dw	m07113
+	dw	m13113
+	dw	m03113
+	dw	m03113
+	dw	m04113
+	dw	m03113
+	dw	m05113
+	dw	m03113
+	dw	m06113
+	dw	m05113
+	dw	m06113
+	dw	m07113
+	dw	m07113
+	dw	m14113
+	dw	m05113
+	dw	m03113
+	dw	m15113
+	dw	m08113
+	dw	m16113
+	dw	m08113
+	dw	m17113
+	dw	m08113
+	dw	m09113
+	dw	m08113
+	dw	m18113
+	dw	m08113
+	dw	m19113
+	dw	m08113
+	dw	m09113
+	dw	m0a113
+	dw	m1a113
+	dw	m0a113
+	dw	m1b113
+	dw	m0b113
+	dw	m1c113
+	dw	m0b113
+	dw	m1d113
+	dw	m0c113
+	dw	m0d113
+	dw	m0d113
+	dw	m1e113
+	dw	m0c113
+	dw	m1f113
+	dw	m0d113
+	dw	m0d113
+	dw	m0d113
+	dw	m20113
+	dw	mend
+
+m01113
+	db	prgcng,s1d3ch01,normal
+	db	 040,bn4+00,039	;ch01
+	db	 024,gs5+00,031	;ch01
+	db	 008,fs5+00,015	;ch01
+	db	 024,en5+00,015	;ch01
+	db	mend
+
+m10113
+	db	 040,bn5+00,039	;ch01
+	db	 024,gs5+00,023	;ch01
+	db	mend
+
+m02113
+	db	 008,fs5+00,007	;ch01
+	db	 024,en5+00,015	;ch01
+	db	mend
+
+m11113
+	db	 016,bn5+00,015	;ch01
+	db	 008,gs5+00,007	;ch01
+	db	 016,fs5+00,015	;ch01
+	db	 056,en5+00,039	;ch01
+	db	mend
+
+m12113
+	db	 096,bn5+00,079	;ch01
+	db	 024,bn5+00,023	;ch01
+	db	 040,en5+00,039	;ch01
+	db	mend
+
+m03113
+	db	 008,en5+00,007	;ch01
+	db	 008,fs5+00,007	;ch01
+	db	mend
+
+m04113
+	db	 008,gs5+00,007	;ch01
+	db	 008,bn5+00,007	;ch01
+	db	 008,gs5+00,007	;ch01
+	db	 008,fs5+00,007	;ch01
+	db	mend
+
+m05113
+	db	 008,gs5+00,007	;ch01
+	db	 008,fs5+00,007	;ch01
+	db	mend
+
+m06113
+	db	 008,gs5+00,007	;ch01
+	db	 008,as5+00,007	;ch01
+	db	mend
+
+m07113
+	db	 008,bn5+00,007	;ch01
+	db	 008,cs6+00,007	;ch01
+	db	mend
+
+m13113
+	db	 024,en6+00,023	;ch01
+	db	 024,bn5+00,019	;ch01
+	db	 024,gs5+00,022	;ch01
+	db	 016,fs5+00,015	;ch01
+	db	 008,en5+00,007	;ch01
+	db	 024,fs5+00,023	;ch01
+	db	 072,dn5+00,039	;ch01
+	db	mend
+
+m14113
+	db	 024,en6+00,023	;ch01
+	db	 040,bn5+00,019	;ch01
+	db	mend
+
+m15113
+	db	 064,gs5+00,063	;ch01
+	db	 020,ds5+00,015	;ch01
+	db	 016,ds5+00,007	;ch01
+	db	 116,ds5+00,091	;ch01
+	db	mend
+
+m08113
+	db	 016,gs5+00,015	;ch01
+	db	 032,fs5+00,035	;ch01
+	db	mend
+
+m16113
+	db	 048,gs5+00,015	;ch01
+	db	mend
+
+m17113
+	db	 048,bn5+00,019	;ch01
+	db	mend
+
+m09113
+	db	 048,en5+00,015	;ch01
+	db	 024,en5+00,023	;ch01
+	db	 024,cs5+00,027	;ch01
+	db	 048,bn4+00,019	;ch01
+	db	mend
+
+m18113
+	db	 048,gs5+00,015	;ch01
+	db	mend
+
+m19113
+	db	 048,bn5+00,019	;ch01
+	db	mend
+
+m0a113
+	db	 024,en5+00,023	;ch01
+	db	 024,cs5+00,023	;ch01
+	db	 008,fs4+00,007	;ch01
+	db	 008,gs4+00,011	;ch01
+	db	mend
+
+m1a113
+	db	 032,an4+00,007	;ch01
+	db	mend
+
+m1b113
+	db	 008,an4+00,007	;ch01
+	db	 076,en5+00,071	;ch01
+	db	 008,fs4+00,007	;ch01
+	db	 004,gs4+00,007	;ch01
+	db	 012,an4+00,011	;ch01
+	db	 092,en5+00,087	;ch01
+	db	 008,bn5+00,007	;ch01
+	db	 088,en5+00,083	;ch01
+	db	 012,bn4+00,011	;ch01
+	db	 004,ds5+00,007	;ch01
+	db	mend
+
+m0b113
+	db	 008,fs5+00,007	;ch01
+	db	 016,bn5+00,007	;ch01
+	db	 024,bn5+00,011	;ch01
+	db	 008,bn5+00,011	;ch01
+	db	 008,fs5+00,007	;ch01
+	db	 008,ds5+00,007	;ch01
+	db	 008,bn4+00,007	;ch01
+	db	 008,an4+00,007	;ch01
+	db	 008,cs5+00,007	;ch01
+	db	 008,en5+00,007	;ch01
+	db	 016,an5+00,007	;ch01
+	db	 024,an5+00,007	;ch01
+	db	 008,an5+00,007	;ch01
+	db	 008,en5+00,007	;ch01
+	db	 008,cs5+00,007	;ch01
+	db	mend
+
+m1c113
+	db	 008,an4+00,007	;ch01
+	db	 008,bn4+00,007	;ch01
+	db	 008,ds5+00,007	;ch01
+	db	mend
+
+m1d113
+	db	 016,an4+00,007	;ch01
+	db	 016,en5+00,015	;ch01
+	db	mend
+
+m0c113
+	db	 016,en5+00,007	;ch01
+	db	 016,en5+00,007	;ch01
+	db	mend
+
+m0d113
+	db	 008,en5+00,007	;ch01
+	db	 016,en5+00,015	;ch01
+	db	mend
+
+m1e113
+	db	 008,en5+00,007	;ch01
+	db	mend
+
+m1f113
+	db	 016,en5+00,007	;ch01
+	db	mend
+
+m20113
+	db	 008,en5+00,007	;ch01
+	db	mend
+
+;Driver #4
+
+ml114 
+	ifnb
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m02114
+	dw	m03114
+	dw	m03114
+	dw	m03114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m02114
+	dw	m04114
+	dw	m05114
+	dw	m0b114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m01114
+	dw	m05114
+	dw	m0c114
+	dw	m04114
+	dw	m06114
+	dw	m0d114
+	dw	m06114
+	dw	m0e114
+	dw	m05114
+	dw	m0f114
+	dw	m04114
+	dw	m06114
+	dw	m10114
+	dw	m06114
+	dw	m11114
+	dw	m05114
+	dw	m12114
+	dw	m04114
+	dw	m06114
+	dw	m13114
+	dw	m06114
+	dw	m14114
+	dw	m05114
+	dw	m15114
+	dw	m04114
+	dw	m06114
+	dw	m16114
+	dw	m06114
+	dw	m17114
+	dw	m06114
+	dw	m07114
+	dw	m04114
+	dw	m08114
+	dw	m04114
+	dw	m18114
+	dw	m07114
+	dw	m04114
+	dw	m08114
+	dw	m06114
+	dw	m19114
+	dw	m06114
+	dw	mend
+
+m01114
+	db	 008,bassd1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,snare1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,hitom1,007	;ch16
+	db	 008,bassd1,007	;ch16
+	db	 008,snare1,007	;ch16
+	db	mend
+
+m02114
+	db	 008,bassd1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,snare1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	mend
+
+m03114
+	db	 008,snare1,007	;ch16
+	db	 008,snare1,007	;ch16
+	db	mend
+
+m04114
+	db	 008,hicng1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	mend
+
+m05114
+	db	 008,snare1,007	;ch16
+	db	 008,bassd1,007	;ch16
+	db	mend
+
+m0b114
+	db	 008,snare1,007	;ch16
+	db	mend
+
+m0c114
+	db	 008,hitom1,007	;ch16
+	db	mend
+
+m06114
+	db	 008,hicng1,007	;ch16
+	db	 008,hicng1,007	;ch16
+	db	mend
+
+m0d114
+	db	 008,snare1,007	;ch16
+	db	mend
+
+m0e114
+	db	 008,bassd1,007	;ch16
+	db	mend
+
+m0f114
+	db	 008,hitom1,007	;ch16
+	db	mend
+
+m10114
+	db	 008,snare1,007	;ch16
+	db	mend
+
+m11114
+	db	 008,bassd1,007	;ch16
+	db	mend
+
+m12114
+	db	 008,hitom1,007	;ch16
+	db	mend
+
+m13114
+	db	 008,snare1,007	;ch16
+	db	mend
+
+m14114
+	db	 008,bassd1,007	;ch16
+	db	mend
+
+m15114
+	db	 008,hitom1,007	;ch16
+	db	mend
+
+m16114
+	db	 008,snare1,007	;ch16
+	db	mend
+
+m17114
+	db	 016,bassd1,007	;ch16
+	db	mend
+
+m07114
+	db	 016,bassd1,007	;ch16
+	db	 008,bassd1,007	;ch16
+	db	mend
+
+m08114
+	db	 008,hicng1,007	;ch16
+	db	 008,bassd1,007	;ch16
+	db	 008,bassd1,007	;ch16
+	db	mend
+
+m18114
+	db	 008,hicng1,007	;ch16
+	db	mend
+
+m19114
+	db	 008,bassd1,007	;ch16
+	db	mend
+	endif
+
+;MIDI events found   = 1099
+;records generated   = 258
+;percent compression = 76
+;total bytes output  = 887

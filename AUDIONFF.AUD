@@ -1,0 +1,76 @@
+; file: audionffp.aud
+
+; This file contains non-FF page declarations for game variables.
+;
+;********************************
+;*  audio absolute variables	*
+;********************************
+;
+abram
+
+;	global audio variables
+sngnum	ds	1		;song number
+
+sndlock	ds	1		;sound lock out flags snd4,snd3,snd2,snd1
+
+;	sound variables
+
+numsnds	ds	1		;number of sounds in queue
+sndindx	ds	1		;queue index for processing
+sndtype	ds	4		;sound effect ID list
+sndpnt	ds	4*2		;sound routine vector table
+sndcnt	ds	4		;sound counters
+sndmsk	ds	4		;sound enable masks
+
+;	music variables
+
+
+sqini				;initialized section
+
+insnum	ds	4		;instrument number
+pitch   ds      4       ;pitch trigger temp
+mtime	ds	4		;time length of event
+
+cntmes  ds      4       ;repeat measure loop counters
+
+duty    ds      4       ;DMG duties
+freqla  ds      4       ;DMG freq low
+freqha  ds      4		;DMG freq high
+vol     ds      4       ;DMG volume
+pan     ds      4       ;DMG pan control
+
+suscnt	ds	3		;sustain counter for 3 drivers
+envcnt	ds	3		;envelope counter for 3 drivers
+spec	ds	3		;special effects
+specnt	ds	3		;special effects counters
+tie	ds	3		;tie situations
+dur	ds	3		;duration of key
+susdur	ds	3		;sus dur for sustained instruments
+mentron ds      2       ;software mentronom for tag sync
+
+tempo	ds	1		;song tempos
+tfract	ds	1		;tempo speed fraction
+drumnum ds      1       ;white drum number;
+drumcnt	ds	1		;white drum number
+stflag	ds	1		;song just started flag
+tflag	ds	1		;tempo roll temp
+
+sqinix
+
+npt_clk ds	1		; music aux timer / clock
+
+stingf  ds      1       ;stinger flag
+
+;
+;
+abramx
+;
+;
+absize	equ	abramx-abram
+;
+;****************
+;* end of file	*
+;****************
+
+
+

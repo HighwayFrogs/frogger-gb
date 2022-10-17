@@ -1,0 +1,347 @@
+;GAMEBOY BASE PROGRAM
+;Copyright 1991, Imagineering Inc.  ***Confidential***
+
+;Hardware	equates
+MBC_REG0 	equ	$1fff
+MBC_REG1 	equ	$3fff
+MBC_REG2 	equ	$5fff
+MBC_REG3	equ	$7fff
+
+;*    6             *
+;*  5   4  2 3  1 0 *
+;*    7             *
+:stickrt		equ	$10		;joystick direction masks
+:sticklf		equ	$20
+:stickup		equ	$40
+:stickdn		equ	$80
+:selkey		equ	4
+:startkey	equ	8
+:bkey		equ	2
+:akey		equ	1
+
+
+
+
+
+;*** RAM Definition ***
+
+
+	org	$C000			;Working RAM
+
+OAMshad	ds	160	;keep at page boundary
+
+;snden		ds      4       ;x000 0000 sound enable flag
+;sndnrm 		ds      4       ;x000 0000 sound not ready for music flag
+sngnum		ds	1	;song number
+;sndcnt		ds	4	;sound counters
+
+		ds	$60-1	;reserve space for audio RAM
+
+     
+
+vbflag		ds	1	;vertical blank flag set by interrupt
+frame		ds	2
+temp0		ds	2
+
+bdeb		ds	1	;debounce flag for trigger b
+adeb		ds	1	;debounce flag for trigger a
+strtdeb		ds	1	;debounce flag for start
+seldeb		ds	1	;debounce flag for select
+
+soundsav	ds	1	;save sound mix during pause
+sndsavea	ds	1
+random		ds	1
+pause		ds	1
+
+audtest		ds	1
+
+	if	emulate
+:MBCshad0	equ	$e7fc		;Use emulator RAM
+		ds	4		;Reserve 4 bytes for ROM version
+	else
+:MBCshad0	ds	4		;Put shadows in Game Boy RAM
+	endif
+:MBCshad1	equ	MBCshad0+1
+:MBCshad2	equ	MBCshad0+2
+:MBCshad3	equ	MBCshad0+3
+
+
+t0		ds	1
+t1		ds	1
+t2		ds	1
+t3		ds	1
+t4		ds	1
+t5		ds	1
+t6		ds	1
+t7		ds	1
+t8		ds	1
+
+decmptmp	ds	1	;for decompression code
+decmpcom	ds	1 
+kludge		ds	2	;for decompression code
+
+
+frogx		ds	1
+frogy		ds	1
+frogframe	ds	1	; 0 - 7, 4 directions, still or jump
+jumpcount	ds	1	;0 = not, 1-8 is count
+jumpx		ds	1	;dx for jump
+jumpy		ds	1	;dy
+dying		ds	1	; <>0 when hit
+gothome		ds	1	;reached goal
+froglane	ds	1	;stored to save recalculation
+loglane		ds	1	;frog on log (1-5)
+sinkdata	ds	4	; 2 bytes for each lane
+				; character location, # of chars
+sinkframe	ds	2	;keep track of current sinking frame
+swimframe	ds	1	;animation counter
+gatortime			;same as fly
+flytime		ds	1	;time fly stays on
+gatordel
+flydel		ds	1	;delay until next fly
+mode		ds	1	;game mode (title, select, game, gameover)
+picdel		ds	1	;seconds to hold current picture
+whichpic	ds	1	;current picture
+bonus		ds	1	;for timer bonus
+p1gover		ds	1
+p2gover		ds	1
+
+; snake variables
+
+cloneflag	ds	1	;if set, flip and duplicate snake
+lcloneflag	ds	1	;for log snake
+snakex		ds	1	;
+lsnakex		ds	1	;
+snakey		ds	1
+lsnakey		ds	1
+snakedir	ds	1
+lsnakedir	ds	1
+snakeon		ds	1
+lsnakeon     	ds	1
+snakeframe	ds	1
+lsnakeframe	ds	1
+lsnakescx	ds	1	;snake x adjusted for scroll
+
+
+;female frog variables
+
+gotfem		ds	1	;set when frog gets female frog
+femx		ds	1
+femy		ds	1
+femdir		ds	1
+femon		ds	1
+femframe	ds	1
+femscx		ds	1
+
+femjump		ds	1	;pointer and counter
+nextjump	ds	1
+
+
+;variables that need to be swapped for two-player version
+
+pdata
+inhome		ds	1	;counter for frogs brought home
+caves		ds	5	;set when cave is occupied
+level		ds	1	;game level
+menleft		ds	1	
+score		ds	4
+lowy		ds	1	;for scoring when jumping up to new lane
+
+pdatalen	equ	lowy-pdata+1
+
+;player one block
+p1data
+p1inhome		ds	1	;counter for frogs brought home
+p1caves			ds	5	;set when cave is occupied
+p1level			ds	1	;game level
+p1menleft		ds	1	
+p1score			ds	4
+p1lowy			ds	1	;for scoring when jumping up to new lane
+
+
+;player two block
+p2data
+p2inhome		ds	1	;counter for frogs brought home
+p2caves			ds	5	;set when cave is occupied
+p2level			ds	1	;game level
+p2menleft		ds	1	
+p2score			ds	4
+p2lowy			ds	1	;for scoring when jumping up to new lane
+
+mouthloc		ds	1	;pointer to gator mnouth on screen
+mouthframe		ds	1
+otterloc		ds	1	;pointer to gator mnouth on screen
+otterframe		ds	1
+logmax			ds	1
+
+
+
+:NUMLANES	equ	13
+
+lanetime	ds	NUMLANES	;value from lanespd
+lanespd		ds	NUMLANES	;speed of lane scroll
+
+timeptr		ds	1	;offset to current timer character
+timebuff	ds	8	;buffer for timer bar
+timedir		ds	1	;1 = count down for bonus, 0 = refill
+
+;hiscores	ds	5*4	;high-score buffer
+;hinames		ds	5*8	;high-score names
+hiflag		ds	1	;for new high score
+hilane		ds	1	;which lane (4 is top, 0 is bottom)
+hiptr		ds	2	;position of name in srroe table
+hicursor	ds	1	;position on line
+namechar	ds	1	;current character under cursor
+stickdel	ds	1	;delay for next alpha character
+charflash	ds	1	
+players		ds	1	;number of players
+whichplayer	ds	1	;if 2 players, which is playing
+float0		ds	1	;for floating bonus numbers
+float1		ds	1	;
+nextsound	ds	1	;when there are several possibilities
+nextsong	ds	1
+
+colchar0	ds	1	;screen collision characters
+colchar1	ds	1
+colchar2	ds	1
+xmod8		ds	1	;low 3 bits of x position for collision check
+toggle		ds	1
+ram_top			;end of $c000 RAM definitions
+	ORG	$df00
+hiscores	ds	5*4	;high-score buffer
+hinames		ds	5*8	;high-score names
+signature	ds	3
+titleflag	equ	$dffd
+firststart	equ	$dffe	;if 0, then don't allow start from title
+gameover	equ	$dfff
+
+	org	$FF80			;Internal (to DMG chip) RAM
+
+dma_to_OAM	ds	10		;Space for DMA routine
+
+
+	include	audioffp.dmg
+;	ds	$30		;space for audio RAM
+
+
+
+stick
+cnt1		ds      1       	;key input (controller)
+
+trg1		ds      1       	;trigger input (er)
+
+lanecount	ds	1		;irq pointer
+toplane		ds	1		;padding (lanes are offset by one)
+xlane		ds	NUMLANES	;scroll values for lanes
+
+
+iram_end
+
+
+; game equates
+
+;characters
+
+:CARS		equ	$19 	;first car character
+:LOGS		equ	$35	;first log character
+:HOMECHAR	equ	$15	;first of 4
+:TURTLECHAR	equ	$3c	;first turtle	
+:TIMECHAR	equ	$01	;first of 9
+:MOUTHCHAR	equ	$2e	;gator mouth
+:OTTERCHAR	equ	$31
+:MENCHAR	equ	$42	;men left
+:EXCLAM		equ	$4f
+:ZEROCHAR	equ	$f6	;didgits are at $f6-$ff
+:ALPHACHAR	equ	$db	;letter A
+:EXCLAM1	equ	ALPHACHAR-2	;for level messages
+:floatchar	equ	$3a	;floating bonus numbers
+femchar		equ	$36	;female frog
+:floatword	equ	$44
+pauseloc	equ	$99e6
+alphaloc	equ	$8db0
+alphaoff	equ	ALPHACHAR-"A"+1
+
+;uploc		equ	$99e1
+statloc		equ	$99e0	;start of status area
+timeloc		equ	$9a06	;first timer screen location
+p1scoreloc	equ	$9a00	;screen pos for score
+p1menloc	equ	$9a20	;men left screen location
+p2scoreloc	equ	$9a0f
+p2menloc	equ	$9a2f
+lnumloc		equ	timeloc+$27
+
+bottomloc	equ	$9a20
+
+numfont		equ	$8f60	;character memory location for digit font
+statfont	equ	$8f50	
+hiwordloc	equ	$9945-2	;-$20	;position for "HIGH SCORE"
+hiloc		equ	$9983	;-$20	;screen position for high score table
+namelen		equ	8	;maximum number of letters
+
+STARTY		equ	$80	;frog starting position
+femstarty	equ	$3d
+
+dieframe	equ	$10	;first dying frame number
+
+
+jump_s		equ	$8c	;jumping sound
+car_s		equ	$82
+fem_s		equ	$86
+;femcave_s	equ	$86
+fly_s		equ	$87
+cave_s		equ	$83
+drown_s		equ	$81
+gator_s		equ	$89
+snake_s		equ	$82
+stick_s		equ	$80
+timelow_s	equ	$84
+
+title_s		equ	6	;theme song
+newlev_s	equ	2
+gover_s		equ	5
+gotfem_s	equ	3
+femcave_s	equ	4
+xman_s		equ	7
+
+flyloc		equ	oamshad+$10	;next spot after frog
+gatorloc	equ	flyloc
+snakeloc	equ	flyloc+$10
+snake1loc	equ	snakeloc+$c
+lsnakeloc	equ	snake1loc+$c
+femloc		equ	lsnakeloc+$c
+float0loc	equ	femloc+$10
+float1loc	equ	femloc+$1c
+tbonloc		equ	float1loc+$c
+flychar		equ	$28		;first char after frog
+snakechar	equ	$2c
+gatorchar	equ	$32
+;femchar		equ	$0		;temp
+
+tmode		equ	0	;title screen mode
+smode		equ	1	;select screen
+gmode		equ	2	;game 
+omode		equ	3	;game over
+rmode0		equ	4	;get ready at game start
+rmode1		equ	5	;get ready during game
+bmode		equ	6
+lmode		equ	$ff
+
+goverpic	equ	5
+selpic		equ	4	;select screen
+ready0pic	equ	6
+ready1pic	equ	7
+crednum		equ	3	;number of credit screens
+
+sinkmax		equ	$a
+firstly		equ	$17	;first interrupt
+lives		equ	4	;men in reserve
+frogsely	equ	$43	;screen pos of frog as select pointer
+homedel		equ	$80	;frames between frogs
+dieval		equ	$4f
+
+	if devel
+screendel	equ	$01	;seconds for each screen
+	else
+screendel	equ	$03
+	endif
+

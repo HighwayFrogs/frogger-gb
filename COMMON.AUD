@@ -1,0 +1,232 @@
+;****************************************
+;*								*
+;*            COMMON.AUD				*
+;*								*
+;*  	 Code for common area			*
+;*								*
+;*	GameBoy Music Sub-System		*
+;*	    							*
+;* Copyright (c) 1991 Imagineering, Inc.*
+;*	    							*
+;****************************************
+;
+;
+;    Prepared for Imagineering, Inc. by
+;    
+;	Stuart E. Ross
+;	New Potato Technologies
+;	P.O. Box 187
+;	Danbury, CT  06813
+;
+;	TEL:  (203) 746-9040
+;	FAX:  (203) 746-6929
+;
+;
+;--------------------------------------
+
+ramsize	equ	zpsize+absize
+
+;------------------------------------
+;
+;	Global Sound Routines
+;
+;------------------------------------
+
+sndposmsk
+
+	db	$01, $02, $04, $08
+
+sndnegmsk
+
+	db	$FE, $FD, $FB, $F7
+
+;------------------------------------
+;
+;    Start / Stop Song Play
+;
+;    a  - song number (0=kill)
+;
+;------------------------------------
+
+setseq
+
+	ld      (sngnum),a              ;store song number
+	cp	0
+	jr	nz,goseq
+
+;	(0=kill) disable sound channels here
+
+	ld      bc,3            		;loop through all 3 channels
+
+l0      ld      hl,sndposmsk
+	add	hl,bc
+	ld	a,(sndlock)	
+	and	(hl)
+	jr	nz,l1
+
+	call    gen_off					;silence!
+
+l1	dec     c						;next driver
+	bit     7,c
+	jr      z,l0
+
+	ret	
+
+;	copy song sequence pointers from sngtab in *.mus
+
+goseq
+	sla     a                       ;index song table 8 bytes per entry
+	sla     a
+	sla     a
+	ld      c,a                     ;song index in bc
+	xor     a
+	ld      b,a                     ;clear bde
+	ld      d,a
+	ld      e,a
+
+	ld      hl,sngtab               ;copy song table to
+	add     hl,bc
+	ld      de,sngpt0               ;sngpt0
+
+	ld      c,8                     ;copy all 8 bytes
+
+l0	ld      a,(hli)                 ;load
+	ld      (de),a                  ;store
+	inc     de                      ;next dest
+	dec     c                       ;count
+	jr      nz,l0                   ;loop
+
+	ld      d,0                     ;avoid trouble
+
+;	clear sequence varibles
+
+	xor     a                       ;clear nffp vars
+	ld      e,sqinix-sqini          ;all bytes of sequence vars
+	ld      hl,sqini
+l0
+	ld      (hli),a
+	dec     e
+	jr      nz,l0                   ;clear loop
+
+	ld      e,sqinix2-sqini2        ;and ffp vars
+	ld      hl,sqini2
+l0
+	ld      (hli),a
+	dec     e
+	jr      nz,l0                   ;clear loop
+
+;	Configure stereo configuration
+
+	ld      hl,sngpan               ;addr stereo panpot table
+	ld      a,(sngnum)              ;index by song
+	ld      e,a
+	add     hl,de
+	ld      a,(hl)                  ;lookup panpot settings
+	ld      (stereo),a              ;save them
+
+;	init waveform for sound 3
+
+	xor	a	            		;turn driver nr3 off
+	ld      (nr30),a        		
+
+	ld      c,16            		;copy the waveform table into waveform RAM
+	ld      hl,waveform
+	ld      de,$ff30
+l0      ld      a,(hli)
+	ld      (de),a
+	inc     de
+	dec     c
+	jr      nz,l0
+
+	ld      d,0             		;avoid trouble
+
+	ld      a,%10000000
+	ld      (nr30),a        		;turn nr3 on
+
+;	Initialize sequencer variables
+
+	ld      a,1                     ;set all times to 1 tic
+	ld      hl,mtime
+	ld      (hli),a
+	ld      (hli),a
+	ld      (hli),a
+	ld      (hl),a
+
+	ld      (mentron),a             ;metronome = 1
+
+	ld      a,$FF                   ;set these to -1
+	ld      (stflag),a
+	ld      (tfract),a
+
+	ld      a,(sngnum)              ;get tempo for this song
+	ld      c,a
+	ld      hl,tempos
+	add     hl,bc
+	ld      a,(hl)
+	ld      (tempo),a
+
+	ret
+
+;------------------------------------
+;
+;       quiet all sound
+;
+;------------------------------------
+
+alloff
+	push    af
+	push    bc
+
+;	Reset all sound effects in queue and sngnum
+
+	ld	a,0			  
+	ld	(numsnds),a	  	; zero out numsnds
+	ld	(sndlock),a		; reset lockout flags
+	ld	(sngnum),a		; reset current sngnum
+
+;	Turn off generation of audio
+
+	ld      bc,3            ; loop through all 3 channels
+
+l0      call    gen_off			; silence!
+
+	dec     c
+	bit     7,c
+	jr      z,l0
+
+	pop     bc
+	pop     af
+	ret
+
+;------------------------------------
+;
+;	Sound Gen Waveforms
+;
+;------------------------------------
+
+	ifdef bart
+	ifdef	devapd
+	include	bart\wave.dat
+	else
+	include	wave.dat
+	endif
+	endif
+
+	ifdef turn
+	ifdef	devapd
+	include	turn\wave.dat
+	else
+	include	wave.dat
+	endif
+	endif
+
+	ifdef home
+	ifdef	devapd
+	include	home\wave.dat
+	else
+	include	wave.dat
+	endif
+	endif
+;
+
+
