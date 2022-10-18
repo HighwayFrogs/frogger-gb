@@ -400,7 +400,7 @@ wfram   equ     $FF30           ;wave form RAM
 	ifdef	devapd
 	include	home\homedef.snd
 	else
-	include	frogdef.snd
+	include	..\frogdef.snd
 	endif
 	endif
 ;
