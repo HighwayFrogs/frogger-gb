@@ -37,7 +37,7 @@ Command: `cd SOURCE`
 **4)** Assemble the ROM by running `MAKE.BAT`.  
 Upon a successful build, the ROM file will be named: `FROG.BIN`.  
 
-## Toolchain Info
+### Toolchain Info
 **dmg.exe:**  
 An assembler of unknown origin, dated December 1989.  
 This assembler has no documentation.  
@@ -46,8 +46,21 @@ It appears to output "glod" files, which appear to be very simple linkable objec
 **glod2bin.exe:**  
 Converts the previously mentioned "glod" files into an actual GameBoy ROM.  
 
+## File Type Info
+### Graphics
+```
+.LBM: Electronic Arts Deluxe Paint Image File openable with https://sourceforge.net/projects/sagethumbs/
+.RAW/.NIN: CMPMAP.EXE (Compress Map from LBM, according to TITLE.DMG, NIN2RUNL.EXE is mentioned by DECMPRS.DMG suggesting it was used to compress NIN files?)
+.RAW/.FNT: N2D.EXE (Compress Font, according to TITLE.DMG)
+```
 
-### Glod File Documentation
+### Code
+```
+.LOD: Glod file (Linker Object)
+.DMG/.AUD/.SND/....: Assembly Source File (DMG.EXE)
+```
+
+### Glod Files (.LOD)
 Glod files are broken up into chunks.  
 A glod file can have any number of chunks, placed sequentially.  
 It reports having been built in June 1990 by "Mark D. Klein", who does appear to be credited on various GameBoy games.  
@@ -61,6 +74,6 @@ u8 bankId; // The bank ID of the chunk data. (This is a guess)
 u8[] chunkData; // The bytes assembled from the assembly text. (Size is 'chunkDataSize' from earlier)
 ```
 
-### Disclaimer
+## Disclaimer
 Preserved by [Highway Frogs](https://highwayfrogs.net/)  
 This repository is provided for preservation / educational purposes only.  
