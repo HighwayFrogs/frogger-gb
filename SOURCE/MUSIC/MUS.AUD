@@ -15,7 +15,7 @@ home	equ	1
 
 	org	$FF8A
 
-	include	"..\audioffp.dmg"	;music handler $FF00 RAM
+	include	"audioffp.aud"	;music handler $FF00 RAM
 
 	if $>$FF8A+$30
 	pseudwarn *** Overflow of $FF00 variable space ***

@@ -1,0 +1,52 @@
+; file: audioffp.aud
+
+; This file contains FF page declarations for game variables.
+;
+;**********************************
+;* audio FF page variables    *
+;**********************************
+;
+zpram
+;
+;****************
+;* pointers	*
+;****************
+
+sngpt0          ds      8       ;measure list pointers for all drivers
+
+sqini2
+sndtmp						;temporary space for sound routines
+syncpnt                         ;temporary mespnt setup pointer
+inspnt          ds      2       ;temporary instrument envelope pointer
+
+sngpnt          ds      2       ;temp song pointer
+mslpnt          ds      2       ;temp measure list pointer
+mespnt		ds		2		;measure pointer
+seqnum		ds		4		;sequence number in song
+mesnum		ds		4		;measure group number in sequence
+evtnum          ds      4       ;event number in measure group
+seqi            ds      1       ;temp sequence index
+mesi            ds      1       ;temp measure index
+evti            ds      1       ;temp event index
+ieflag          ds      1       ;increment event flag
+sqinix2
+
+stereo  ds      1               ;music channel allocation for nr51
+
+synct0  ds      1               ;interrupt temps
+synct1  ds      1
+synct2  ds      1
+synct3  ds      1
+
+asynt0  ds      1               ;asynchronous temps
+asynt1  ds      1
+asynt2  ds      1
+
+;
+;
+zpramx
+zpsize	equ	zpramx-zpram
+;
+;
+;
+

@@ -1,21 +1,22 @@
-REM TODO: Verify 16 bit system.
+REM This script will fail in an environment unable to run 16-bit DOS applications.
 
-REM Assembles frog.dmg -> frog.lod
+REM Assembles FROG.DMG -> FROG.LOD
 REM Output: FROG.LOD, BASE.SYM
-dmg frog
+dmg FROG
 
 REM Assembles music -> MUS.LOD
 REM This isn't actually used right now. This is because it outputs a slightly different LOD file.
 cd MUSIC
-REM ..\dmg MUS.AUD
+..\dmg MUS.AUD
 cd ..\
-REM copy MUSIC\MUS.LOD .\MUS.LOD
 
 REM Adds music
 REM Output: frogger.lod
-copy /b frog.lod+mus.lod frogger.lod
-del frog.bin
+copy /b FROG.LOD+MUSIC\MUS.LOD frogger.lod
+del ..\FROG.BIN
+del MUS.LOD
 
 REM Turns Our LOD File into a ROM.
-REM Output: frogger.bin
+REM Output: FROGGER.BIN
 glod2bin frogger
+ren frogger.bin ..\FROG.BIN
