@@ -1,5 +1,6 @@
-# Frogger (Game Boy / Game Boy Color)
-The official source code to Frogger for Game Boy and Game Boy Color.  
+# Frogger (Game Boy)
+The official source code to Frogger for Game Boy.  
+This source code is from after the first retail release, but before the Game Boy Color enhancements were added.    
 **Development Start:** May 1 1998  
 **Developer:** Morning Star Media  
 **Programmer:** David Lubar  
